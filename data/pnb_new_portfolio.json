@@ -1,0 +1,47 @@
+[
+  {
+    "instrument_id": "PNB_NEW_GIRR_IRS_DOMESTIC",
+    "risk_class": "GIRR",
+    "bucket": "INR",
+    "risk_factor": "5Y",
+    "sensitivity": 487612.73,
+    "notional": 1116373.94,
+    "currency": "INR"
+  },
+  {
+    "instrument_id": "PNB_NEW_GIRR_GSEC_TRADING",
+    "risk_class": "GIRR",
+    "bucket": "INR",
+    "risk_factor": "10Y",
+    "sensitivity": -152340.00,
+    "notional": 250000.00,
+    "currency": "INR"
+  },
+  {
+    "instrument_id": "PNB_NEW_EQ_PNB_HOUSING",
+    "risk_class": "Equity",
+    "bucket": "EM_LargeCap",
+    "risk_factor": "PNB_HFL",
+    "sensitivity": 2400.00,
+    "notional": 9502.46,
+    "currency": "INR"
+  },
+  {
+    "instrument_id": "PNB_NEW_EQ_PNB_GILTS",
+    "risk_class": "Equity",
+    "bucket": "EM_LargeCap",
+    "risk_factor": "PNB_GILTS",
+    "sensitivity": 1250.00,
+    "notional": 750.00,
+    "currency": "INR"
+  },
+  {
+    "instrument_id": "PNB_NEW_EQ_OTHER_TRADING",
+    "risk_class": "Equity",
+    "bucket": "EM_LargeCap",
+    "risk_factor": "EQUITY_TRADING_BOOK",
+    "sensitivity": 1567.15,
+    "notional": 21925.40,
+    "currency": "INR"
+  }
+]

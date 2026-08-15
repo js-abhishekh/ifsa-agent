@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.pytest_cache
+__pycache__
+*.pyc
+
+# Exclude heavy cache and runtime dirs from build context
+data/hf_cache
+data/chroma_db
+data/uploads
+
+# Exclude frontend dependencies and build output (will be built inside Docker)
+frontend/node_modules
+frontend/.next
+frontend/out

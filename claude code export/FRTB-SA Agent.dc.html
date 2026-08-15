@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/prop-types@15/prop-types.js"></script>
+  <script src="https://unpkg.com/recharts@2/umd/Recharts.js"></script>
+  <style>
+    body { margin: 0; background: #0A0E1A; font-family: 'Inter', sans-serif; }
+    a { color: {{ accentColor }}; text-decoration: none; }
+    a:hover { color: #A5B4FC; text-decoration: underline; }
+    ::selection { background: {{ accentColor }}; color: #0A0E1A; }
+    @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(129,140,248,0.35); } 50% { box-shadow: 0 0 0 6px rgba(129,140,248,0.12); } }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:#0A0E1A;color:#E2E8F0;display:flex;flex-direction:column;font-family:'Inter',sans-serif;">
+
+  <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid #1E293B;position:sticky;top:0;background:rgba(10,14,26,0.95);z-index:20;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:22px;height:22px;background:{{ accentColor }};border-radius:4px;"></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;letter-spacing:0.08em;color:#E2E8F0;">FRTB-SA AGENT</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#64748B;">
+      <span>{{ headerScreenLabel }}</span>
+      <sc-if value="{{ hasRunId }}"><span style="color:#334155;">|</span><span>{{ runId }}</span></sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:64px 24px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:680px;text-align:center;">
+        <h1 style="font-size:44px;font-weight:600;letter-spacing:-0.01em;margin:0;line-height:1.15;">FRTB-SA Autonomous Capital &amp; Audit Engine</h1>
+        <p style="font-size:16px;color:#94A3B8;margin:0;line-height:1.6;">Drop any Bank Disclosure or Trading Book PDF. We extract the portfolio, audit regulatory compliance, and compute standardised capital charges in real time.</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+        <div
+          onClick="{{ openFilePicker }}"
+          onDrop="{{ handleDrop }}"
+          onDragOver="{{ handleDragOver }}"
+          onDragLeave="{{ handleDragLeave }}"
+          style="width:600px;padding:56px 32px;border:2px dashed {{ dropzoneBorder }};border-radius:10px;background:{{ dropzoneBg }};text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <svg width="40" height="48" viewBox="0 0 40 48" fill="none">
+            <path d="M4 2H26L36 12V44C36 45.1 35.1 46 34 46H4C2.9 46 2 45.1 2 44V4C2 2.9 2.9 2 4 2Z" stroke="#475569" stroke-width="2"/>
+            <path d="M26 2V12H36" stroke="#475569" stroke-width="2"/>
+          </svg>
+          <div style="font-size:15px;font-weight:500;color:#E2E8F0;">Drag &amp; drop a PDF, or click to browse</div>
+          <div style="font-size:12px;color:#64748B;font-family:'JetBrains Mono',monospace;">Bank Pillar 3 Disclosure · Trading Book Report · Regulatory Circular</div>
+        </div>
+        <input type="file" accept="application/pdf" ref="{{ fileInputRef }}" onChange="{{ handleFileInput }}" style="display:none;"/>
+        <button onClick="{{ startDemo }}" style="background:none;border:1px solid #1E293B;color:#94A3B8;font-size:13px;font-family:'JetBrains Mono',monospace;padding:10px 18px;border-radius:6px;cursor:pointer;" style-hover="border-color:#334155;color:#E2E8F0;">
+          Or run analysis on sample Bank Disclosure PDF (PNB Trading Book) →
+        </button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:900px;width:100%;padding-top:24px;border-top:1px solid #1E293B;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ accentColor }};">01</span>
+          <div style="font-size:14px;font-weight:600;">Automated Sensitivity Extraction</div>
+          <div style="font-size:13px;color:#64748B;line-height:1.5;">PV01, Vega and notionals parsed directly from PDF tables.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ accentColor }};">02</span>
+          <div style="font-size:14px;font-weight:600;">Pillar 3 Regulatory Audit</div>
+          <div style="font-size:13px;color:#64748B;line-height:1.5;">Identifies missing charges, illegal shocks and disclosure gaps.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ accentColor }};">03</span>
+          <div style="font-size:14px;font-weight:600;">Deterministic SBM Quant Core</div>
+          <div style="font-size:13px;color:#64748B;line-height:1.5;">MAR21 / MAR22 / MAR23 capital charge computation.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isWorkspace }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;min-height:0;">
+      <div style="width:280px;flex:none;border-right:1px solid #1E293B;padding:20px 16px;overflow-y:auto;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#64748B;margin-bottom:14px;">PIPELINE</div>
+        <sc-for list="{{ nodesView }}" as="node" hint-placeholder-count="6">
+          <div style="display:flex;gap:12px;padding:10px 10px;border-radius:6px;margin-bottom:2px;background:{{ node.rowBg }};animation:{{ node.rowAnim }};">
+            <div style="flex:none;width:20px;display:flex;justify-content:center;padding-top:2px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:{{ node.dotColor }};"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="font-size:13px;font-weight:500;color:{{ node.labelColor }};">{{ node.label }}</div>
+              <div style="font-size:11.5px;color:#64748B;line-height:1.4;">{{ node.desc }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+        <div style="height:48px;flex:none;display:flex;gap:4px;border-bottom:1px solid #1E293B;padding:0 20px;align-items:flex-end;">
+          <button onClick="{{ setTabFeed }}" style="background:none;border:none;padding:12px 14px;font-size:13px;cursor:pointer;color:{{ tabFeedColor }};border-bottom:2px solid {{ tabFeedBorder }};font-family:'Inter',sans-serif;">Live Feed</button>
+          <button onClick="{{ setTabPortfolio }}" style="background:none;border:none;padding:12px 14px;font-size:13px;cursor:pointer;color:{{ tabPortfolioColor }};border-bottom:2px solid {{ tabPortfolioBorder }};font-family:'Inter',sans-serif;">Portfolio Review</button>
+          <button onClick="{{ setTabPdf }}" style="background:none;border:none;padding:12px 14px;font-size:13px;cursor:pointer;color:{{ tabPdfColor }};border-bottom:2px solid {{ tabPdfBorder }};font-family:'Inter',sans-serif;">PDF Document</button>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:20px 24px;min-height:0;">
+          <sc-if value="{{ showFeed }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:760px;">
+              <sc-for list="{{ logsView }}" as="entry" hint-placeholder-count="4">
+                <div style="border:1px solid {{ entry.border }};background:{{ entry.bg }};border-radius:6px;padding:12px 14px;animation:fadeSlideUp 0.3s ease;">
+                  <div style="display:flex;gap:10px;align-items:flex-start;cursor:{{ entry.cursor }};" onClick="{{ entry.onClick }}">
+                    <div style="width:7px;height:7px;border-radius:50%;background:{{ entry.dot }};margin-top:5px;flex:none;"></div>
+                    <div style="flex:1;">
+                      <div style="font-size:13px;color:#E2E8F0;line-height:1.5;">{{ entry.text }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#475569;margin-top:3px;">{{ entry.node }}</div>
+                      <sc-if value="{{ entry.expanded }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:8px;font-size:12px;color:#94A3B8;">{{ entry.meta }}</div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showPortfolio }}" hint-placeholder-val="{{ false }}">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead>
+                <tr style="border-bottom:1px solid #1E293B;">
+                  <th style="text-align:left;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Instrument ID</th>
+                  <th style="text-align:left;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Risk Class</th>
+                  <th style="text-align:left;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Bucket</th>
+                  <th style="text-align:left;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Risk Factor</th>
+                  <th style="text-align:right;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Sensitivity (PV01)</th>
+                  <th style="text-align:right;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Notional</th>
+                  <th style="text-align:left;padding:8px 10px;color:#64748B;font-weight:500;font-size:11.5px;">Ccy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ positionsView }}" as="p" hint-placeholder-count="6">
+                  <tr style="border-bottom:1px solid #141C2E;">
+                    <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#94A3B8;">{{ p.id }}</td>
+                    <td style="padding:9px 10px;"><span style="font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:4px;background:{{ p.badgeBg }};color:{{ p.color }};">{{ p.riskClass }}</span></td>
+                    <td style="padding:9px 10px;color:#CBD5E1;">{{ p.bucket }}</td>
+                    <td style="padding:9px 10px;color:#CBD5E1;">{{ p.riskFactor }}</td>
+                    <td style="padding:9px 10px;text-align:right;"><input value="{{ p.sensitivity }}" onChange="{{ p.onSensitivity }}" style="background:#0F1524;border:1px solid #1E293B;color:#E2E8F0;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;width:100px;padding:4px 6px;border-radius:4px;"/></td>
+                    <td style="padding:9px 10px;text-align:right;"><input value="{{ p.notional }}" onChange="{{ p.onNotional }}" style="background:#0F1524;border:1px solid #1E293B;color:#E2E8F0;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;width:110px;padding:4px 6px;border-radius:4px;"/></td>
+                    <td style="padding:9px 10px;color:#64748B;font-family:'JetBrains Mono',monospace;font-size:12px;">{{ p.currency }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </sc-if>
+
+          <sc-if value="{{ showPdf }}" hint-placeholder-val="{{ false }}">
+            <sc-if value="{{ hasFileUrl }}" hint-placeholder-val="{{ false }}">
+              <iframe src="{{ fileUrl }}" style="width:100%;height:70vh;border:1px solid #1E293B;border-radius:6px;background:#fff;"></iframe>
+            </sc-if>
+            <sc-if value="{{ noFileUrl }}" hint-placeholder-val="{{ true }}">
+              <div style="height:70vh;border:1px solid #1E293B;border-radius:6px;background:repeating-linear-gradient(135deg,#0D1220,#0D1220 12px,#0F1524 12px,#0F1524 24px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#64748B;letter-spacing:0.05em;">SAMPLE PDF PREVIEW</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#94A3B8;">{{ fileName }}</div>
+              </div>
+            </sc-if>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ pipelineDone }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;padding:16px 24px;border-top:1px solid #1E293B;display:flex;justify-content:flex-end;animation:fadeSlideUp 0.4s ease;">
+            <button onClick="{{ goToResults }}" style="background:{{ accentColor }};color:#0A0E1A;font-size:14px;font-weight:600;padding:11px 22px;border:none;border-radius:6px;cursor:pointer;">View Results →</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="width:320px;flex:none;border-left:1px solid #1E293B;padding:20px 18px;overflow-y:auto;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#64748B;margin-bottom:14px;">INSPECTOR</div>
+        <div style="font-size:13px;font-weight:600;color:#E2E8F0;margin-bottom:10px;">{{ activeNodeLabel }}</div>
+        <pre style="background:#0F1524;border:1px solid #1E293B;border-radius:6px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#94A3B8;overflow-x:auto;line-height:1.6;">{{ peekJson }}</pre>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isResults }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;padding:40px 48px;max-width:1280px;margin:0 auto;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:28px;">
+
+      <div style="border:1px solid {{ bannerBorder }};background:{{ bannerBg }};border-radius:8px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:16px;font-weight:700;color:{{ bannerColor }};letter-spacing:0.02em;">{{ bannerLabel }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#94A3B8;">{{ summaryString }}</div>
+        </div>
+        <div style="width:10px;height:10px;border-radius:50%;background:{{ bannerColor }};flex:none;"></div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#94A3B8;letter-spacing:0.04em;margin-bottom:14px;">CAPITAL CHARGES BY RISK CLASS</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+          <sc-for list="{{ metricsView }}" as="m" hint-placeholder-count="5">
+            <div style="border:1px solid #1E293B;background:#111827;border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:{{ m.color }};"></div>
+                <div style="font-size:13px;font-weight:600;color:#E2E8F0;">{{ m.name }}</div>
+              </div>
+              <sc-for list="{{ m.rows }}" as="row" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;">
+                  <span style="color:#64748B;">{{ row.label }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;color:#CBD5E1;">{{ row.value }}</span>
+                </div>
+              </sc-for>
+              <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #1E293B;">
+                <span style="font-size:12.5px;color:#94A3B8;font-weight:500;">Total</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:{{ m.color }};font-weight:600;">{{ m.total }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+        <div style="border:1px solid #1E293B;background:#111827;border-radius:8px;padding:20px;">
+          <div style="font-size:13px;font-weight:600;color:#94A3B8;margin-bottom:8px;">CHARGE BY RISK CLASS &amp; METRIC</div>
+          <x-import component="StackedBarChart" from="./charts.jsx" data="{{ barData }}" hint-size="100%,320px"></x-import>
+        </div>
+        <div style="border:1px solid #1E293B;background:#111827;border-radius:8px;padding:20px;">
+          <div style="font-size:13px;font-weight:600;color:#94A3B8;margin-bottom:8px;">RISK CLASS ALLOCATION</div>
+          <x-import component="DonutChart" from="./charts.jsx" data="{{ donutData }}" hint-size="100%,280px"></x-import>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#94A3B8;letter-spacing:0.04em;margin-bottom:14px;">PILLAR 3 REGULATORY AUDIT FINDINGS ({{ flagCount }})</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ flagsView }}" as="flag" hint-placeholder-count="4">
+            <div style="border:1px solid #1E293B;background:#111827;border-radius:8px;padding:16px 18px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:7px;height:7px;border-radius:50%;background:{{ flag.color }};"></div>
+                  <span style="font-size:12px;font-weight:600;color:{{ flag.color }};letter-spacing:0.03em;">{{ flag.severityLabel }}</span>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#64748B;">{{ flag.page }}</span>
+              </div>
+              <div style="font-size:13px;color:#CBD5E1;font-style:italic;border-left:2px solid #1E293B;padding-left:12px;margin-bottom:8px;line-height:1.5;">{{ flag.quote }}</div>
+              <div style="font-size:12.5px;color:#94A3B8;line-height:1.5;">{{ flag.explanation }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;padding-top:8px;border-top:1px solid #1E293B;">
+        <button onClick="{{ downloadPDF }}" style="background:none;border:1px solid #1E293B;color:#E2E8F0;font-size:13px;padding:10px 16px;border-radius:6px;cursor:pointer;">Download PDF Executive Summary</button>
+        <button onClick="{{ exportJSON }}" style="background:none;border:1px solid #1E293B;color:#E2E8F0;font-size:13px;padding:10px 16px;border-radius:6px;cursor:pointer;">Export Complete Run JSON</button>
+        <button onClick="{{ copyStatement }}" style="background:none;border:1px solid #1E293B;color:#E2E8F0;font-size:13px;padding:10px 16px;border-radius:6px;cursor:pointer;">Copy Compliance Statement</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:24px;right:24px;background:#111827;border:1px solid {{ accentColor }};color:#E2E8F0;padding:12px 18px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,0.4);animation:fadeSlideUp 0.25s ease;z-index:30;">{{ toastText }}</div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;complianceStatus&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;WARNING&quot;,&quot;options&quot;:[&quot;PASS&quot;,&quot;WARNING&quot;,&quot;INCOMPLETE&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;autoAdvance&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#818CF8&quot;,&quot;options&quot;:[&quot;#818CF8&quot;,&quot;#38BDF8&quot;,&quot;#34D399&quot;,&quot;#FB923C&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Appearance&quot;}}">
+class Component extends DCLogic {
+  nodes = [
+    { id: 'extract_portfolio', label: 'Extract Positions', desc: 'Extracting trading positions & sensitivities from PDF',
+      logs: [
+        { type: 'info', text: 'Parsing PDF structure — 24 pages detected' },
+        { type: 'info', text: 'Located position tables on pages 4, 6, 9' },
+        { type: 'success', text: 'Extracted 6 portfolio positions' },
+        { type: 'metric', text: 'GIRR USD 5Y PV01 = $41,230.55' },
+      ], dataSlice: { node: 'extract_portfolio', extracted_positions: 6, pages_scanned: [4, 6, 9] } },
+    { id: 'audit_document', label: 'Audit Document', desc: 'Scanning PDF for Pillar 3 disclosure breaches',
+      logs: [
+        { type: 'info', text: 'Scanning disclosure narrative for MAR compliance language' },
+        { type: 'flag', text: 'Missing Vega sensitivity disclosure — GIRR options book', meta: 'Page 12, Table 4' },
+        { type: 'flag', text: 'Curvature shock direction inconsistent with MAR21.20', meta: 'Page 14' },
+        { type: 'success', text: 'Audit scan complete — 4 flags raised' },
+      ], dataSlice: { node: 'audit_document', audit_flags: 4, severity_breakdown: { high: 1, medium: 2, low: 1 } } },
+    { id: 'retrieve', label: 'Retrieve Rules', desc: 'Fetching Basel MAR rules from ChromaDB vector store',
+      logs: [
+        { type: 'info', text: 'Querying vector store for applicable MAR clauses' },
+        { type: 'success', text: 'Retrieved 12 clauses: MAR21, MAR22, MAR23' },
+      ], dataSlice: { node: 'retrieve', clauses_retrieved: 12, sources: ['MAR21', 'MAR22', 'MAR23'] } },
+    { id: 'extract_logic', label: 'Extract Logic', desc: 'Extracting risk weights & correlation matrices via LLM',
+      logs: [
+        { type: 'info', text: 'Extracting risk weights & correlation matrices via LLM' },
+        { type: 'success', text: 'Resolved risk weights for 5 risk classes' },
+        { type: 'metric', text: 'GIRR risk weight (5Y bucket) = 1.7%' },
+      ], dataSlice: { node: 'extract_logic', risk_weights_resolved: 5, correlation_matrix: 'GIRR_5x5' } },
+    { id: 'execute_quant', label: 'Execute Quant Core', desc: 'Executing SBM bucket aggregation formulas',
+      logs: [
+        { type: 'info', text: 'Executing SBM bucket aggregation formulas' },
+        { type: 'metric', text: 'GIRR delta_charge = $41,230.55' },
+        { type: 'metric', text: 'Equity delta_charge = $15,750.00' },
+        { type: 'success', text: 'Capital charges computed for all risk classes' },
+      ], dataSlice: { node: 'execute_quant', charges_computed: 5 } },
+    { id: 'validate', label: 'Validate', desc: 'Validating mathematical consistency & output thresholds',
+      logs: [
+        { type: 'info', text: 'Validating mathematical consistency & output thresholds' },
+        { type: 'flag', text: 'FX bucket notional reconciliation gap of 2.3%', meta: 'Schedule R' },
+        { type: 'flag', text: 'DRC issuer default correlation undisclosed — CSR non-securitisation', meta: 'Page 21' },
+        { type: 'success', text: 'Validation complete — ready for review' },
+      ], dataSlice: { node: 'validate', validation_errors: 0, warnings: 2 } },
+  ];
+
+  auditFlags = [
+    { severity: 'high', color: '#EF4444', page: 'Page 12 · Table 4', quote: '"Vega sensitivities for the GIRR options portfolio have not been disclosed in this reporting period."', explanation: 'MAR21.15 requires vega sensitivities to be disclosed for all option positions subject to the SBM. Their absence prevents recomputation of the vega capital charge.' },
+    { severity: 'medium', color: '#F59E0B', page: 'Page 14', quote: '"Curvature scenarios were applied using a uniform +/-1% shock across all tenors."', explanation: 'MAR21.20 requires risk-factor-specific curvature shocks; a uniform shock understates curvature risk for long-dated GIRR exposures.' },
+    { severity: 'low', color: '#F59E0B', page: 'Schedule R', quote: '"Net FX notional reported as $12.0M against a reconciled ledger balance of $12.3M."', explanation: "A 2.3% reconciliation gap between disclosed and ledger FX notionals falls outside the bank's stated tolerance, though below the materiality threshold." },
+    { severity: 'medium', color: '#F59E0B', page: 'Page 21', quote: '"Issuer default correlation assumptions for non-securitised credit are proprietary and not disclosed."', explanation: 'MAR22.14 requires disclosure of default correlation parameters used in DRC calculation for non-securitisation exposures.' },
+  ];
+
+  metricsRaw = [
+    { name: 'GIRR', color: '#3B82F6', delta: 41230.55, vega: 8200.10, curvature: 3100.00, drc: 0, rrao: 0 },
+    { name: 'Equity', color: '#10B981', delta: 15750.00, vega: 4200.00, curvature: 1875.00, drc: 0, rrao: 500.00 },
+    { name: 'FX', color: '#F59E0B', delta: 9200.00, vega: 1500.00, curvature: 620.00, drc: 0, rrao: 0 },
+    { name: 'CSR', color: '#8B5CF6', delta: 6200.00, vega: 950.00, curvature: 310.00, drc: 2200.00, rrao: 0 },
+    { name: 'Commodity', color: '#EF4444', delta: 11400.00, vega: 2600.00, curvature: 980.00, drc: 0, rrao: 0 },
+  ];
+
+  runId = 'RUN-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  fileInputRef = React.createRef();
+
+  state = {
+    screen: 'landing', dragOver: false, fileName: null, fileUrl: null,
+    activeTab: 'feed', nodeIndex: -1, logs: [], expandedFlags: {}, pipelineDone: false,
+    positions: [
+      { id: 'IRS-USD-5Y-001', riskClass: 'GIRR', color: '#3B82F6', bucket: 'USD / 5Y', riskFactor: 'USD OIS 5Y', sensitivity: '41,230.55', notional: '50,000,000', currency: 'USD' },
+      { id: 'IRS-USD-10Y-002', riskClass: 'GIRR', color: '#3B82F6', bucket: 'USD / 10Y', riskFactor: 'USD Swap 10Y', sensitivity: '18,500.00', notional: '25,000,000', currency: 'USD' },
+      { id: 'EQ-RELI-003', riskClass: 'Equity', color: '#10B981', bucket: 'EM Large-Cap', riskFactor: 'Reliance Industries', sensitivity: '15,750.00', notional: '8,000,000', currency: 'INR' },
+      { id: 'FX-USDINR-004', riskClass: 'FX', color: '#F59E0B', bucket: 'USD/INR', riskFactor: 'USD/INR Spot', sensitivity: '9,200.00', notional: '12,000,000', currency: 'USD' },
+      { id: 'CSR-HDFC-005', riskClass: 'CSR', color: '#8B5CF6', bucket: 'BBB Financials', riskFactor: 'HDFC Bank 5Y Bond', sensitivity: '6,200.00', notional: '5,000,000', currency: 'INR' },
+      { id: 'COMM-CRUDE-006', riskClass: 'Commodity', color: '#EF4444', bucket: 'Energy', riskFactor: 'Crude Oil Futures', sensitivity: '11,400.00', notional: '3,000,000', currency: 'USD' },
+    ],
+    countProgress: 0, toast: null,
+  };
+
+  fmt(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  openFilePicker = () => this.fileInputRef.current && this.fileInputRef.current.click();
+  handleFileInput = (e) => { const f = e.target.files && e.target.files[0]; if (f) this.handleFile(f); };
+  handleDragOver = (e) => { e.preventDefault(); this.setState({ dragOver: true }); };
+  handleDragLeave = (e) => { e.preventDefault(); this.setState({ dragOver: false }); };
+  handleDrop = (e) => { e.preventDefault(); this.setState({ dragOver: false }); const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) this.handleFile(f); };
+
+  handleFile(file) {
+    if (file.type !== 'application/pdf') { this.showToast('Please upload a PDF file'); return; }
+    const url = URL.createObjectURL(file);
+    this.startRun(file.name, url);
+  }
+
+  startDemo = () => this.startRun('PNB_Trading_Book_Disclosure_FY26.pdf', null);
+
+  startRun(fileName, fileUrl) {
+    const firstLogs = this.nodes[0].logs.map(l => ({ ...l, node: this.nodes[0].label }));
+    this.setState({ screen: 'workspace', fileName, fileUrl, nodeIndex: 0, logs: firstLogs, pipelineDone: false, activeTab: 'feed', expandedFlags: {} });
+    clearInterval(this.timer);
+    this.timer = setInterval(() => this.tick(), 1600);
+  }
+
+  tick() {
+    const idx = this.state.nodeIndex;
+    if (idx >= this.nodes.length - 1) {
+      clearInterval(this.timer);
+      this.setState({ pipelineDone: true });
+      if (this.props.autoAdvance) setTimeout(() => this.goToResults(), 900);
+      return;
+    }
+    const next = idx + 1;
+    const nodeLogs = this.nodes[next].logs.map(l => ({ ...l, node: this.nodes[next].label }));
+    this.setState(s => ({ nodeIndex: next, logs: [...s.logs, ...nodeLogs] }));
+  }
+
+  goToResults = () => {
+    this.setState({ screen: 'results', countProgress: 0 });
+    const start = performance.now(); const duration = 1100;
+    const step = (t) => {
+      const p = Math.min(1, (t - start) / duration);
+      this.setState({ countProgress: p });
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  setTab = (tab) => this.setState({ activeTab: tab });
+  toggleFlag = (i) => this.setState(s => ({ logs: s.logs.map((l, idx) => idx === i ? { ...l, expanded: !l.expanded } : l) }));
+  updatePosition(i, field, val) { this.setState(s => { const positions = [...s.positions]; positions[i] = { ...positions[i], [field]: val }; return { positions }; }); }
+
+  exportJSON = () => {
+    const payload = { runId: this.runId, positions: this.state.positions, auditFlags: this.auditFlags, metrics: this.metricsRaw };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'frtb_run_' + this.runId + '.json'; document.body.appendChild(a); a.click(); a.remove();
+    this.showToast('Run JSON exported');
+  };
+
+  copyStatement = () => {
+    const s = this.metricsRaw.reduce((a, m) => a + m.delta, 0);
+    navigator.clipboard.writeText(`FRTB-SA Compliance Statement — ${this.runId}: Aggregate delta capital charge $${this.fmt(s)} across 5 risk classes. ${this.auditFlags.length} Pillar 3 audit flags raised. See full run for detail.`)
+      .then(() => this.showToast('Compliance statement copied'));
+  };
+
+  downloadPDF = () => this.showToast('PDF export is simulated in this prototype');
+
+  showToast(msg) { this.setState({ toast: msg }); clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.setState({ toast: null }), 2600); }
+
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this._toastTimer); }
+
+  renderVals() {
+    const accentColor = this.props.accentColor || '#818CF8';
+    const complianceStatus = this.props.complianceStatus || 'WARNING';
+    const s = this.state;
+
+    const bannerMap = {
+      PASS: { color: '#34D399', bg: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.3)', label: 'PASS' },
+      WARNING: { color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.3)', label: 'AUDIT WARNINGS DETECTED' },
+      INCOMPLETE: { color: '#EF4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.3)', label: 'INCOMPLETE — VALIDATION ERRORS' },
+    };
+    const banner = bannerMap[complianceStatus];
+
+    const nodesView = this.nodes.map((n, i) => {
+      const status = i < s.nodeIndex ? 'done' : i === s.nodeIndex ? 'active' : 'pending';
+      return {
+        label: n.label, desc: n.desc,
+        dotColor: status === 'done' ? '#34D399' : status === 'active' ? accentColor : '#334155',
+        labelColor: status === 'pending' ? '#64748B' : '#E2E8F0',
+        rowBg: status === 'active' ? 'rgba(129,140,248,0.08)' : 'transparent',
+        rowAnim: status === 'active' ? 'pulseGlow 2s ease-in-out infinite' : 'none',
+      };
+    });
+
+    const typeStyle = {
+      info: { dot: '#475569', border: '#1E293B', bg: '#111827' },
+      success: { dot: '#34D399', border: 'rgba(52,211,153,0.25)', bg: 'rgba(52,211,153,0.05)' },
+      flag: { dot: '#F59E0B', border: 'rgba(245,158,11,0.25)', bg: 'rgba(245,158,11,0.05)' },
+      metric: { dot: accentColor, border: 'rgba(129,140,248,0.25)', bg: 'rgba(129,140,248,0.05)' },
+    };
+    const logsView = s.logs.map((l, i) => {
+      const st = typeStyle[l.type] || typeStyle.info;
+      return { text: l.text, node: l.node, dot: st.dot, border: st.border, bg: st.bg, meta: l.meta, expanded: !!l.expanded,
+        cursor: l.type === 'flag' ? 'pointer' : 'default', onClick: l.type === 'flag' ? () => this.toggleFlag(i) : undefined };
+    });
+
+    const positionsView = s.positions.map((p, i) => ({
+      ...p, badgeBg: p.color + '1A',
+      onSensitivity: (e) => this.updatePosition(i, 'sensitivity', e.target.value),
+      onNotional: (e) => this.updatePosition(i, 'notional', e.target.value),
+    }));
+
+    const activeNode = s.nodeIndex >= 0 ? this.nodes[s.nodeIndex] : null;
+
+    const rowLabels = [['delta', 'Delta'], ['vega', 'Vega'], ['curvature', 'Curvature'], ['drc', 'DRC'], ['rrao', 'RRAO']];
+    const p = s.countProgress;
+    const metricsView = this.metricsRaw.map(m => ({
+      name: m.name, color: m.color,
+      rows: rowLabels.map(([k, label]) => ({ label, value: '$' + this.fmt(m[k] * p) })),
+      total: '$' + this.fmt((m.delta + m.vega + m.curvature + m.drc + m.rrao) * p),
+    }));
+
+    const flagsView = this.auditFlags.map(f => ({
+      ...f, severityLabel: f.severity.toUpperCase(),
+    }));
+
+    const grandDelta = this.metricsRaw.reduce((a, m) => a + m.delta, 0);
+    const eqDelta = this.metricsRaw.find(m => m.name === 'Equity').delta;
+    const girrDelta = this.metricsRaw.find(m => m.name === 'GIRR').delta;
+
+    return {
+      accentColor,
+      isLanding: s.screen === 'landing', isWorkspace: s.screen === 'workspace', isResults: s.screen === 'results',
+      headerScreenLabel: s.screen === 'landing' ? 'UPLOAD' : s.screen === 'workspace' ? 'LIVE WORKSPACE' : 'RESULTS DASHBOARD',
+      hasRunId: s.screen !== 'landing', runId: this.runId,
+      dropzoneBorder: s.dragOver ? accentColor : '#1E293B',
+      dropzoneBg: s.dragOver ? 'rgba(129,140,248,0.05)' : '#0F1524',
+      openFilePicker: this.openFilePicker, handleFileInput: this.handleFileInput, handleDrop: this.handleDrop,
+      handleDragOver: this.handleDragOver, handleDragLeave: this.handleDragLeave, fileInputRef: this.fileInputRef,
+      startDemo: this.startDemo,
+      nodesView,
+      setTabFeed: () => this.setTab('feed'), setTabPortfolio: () => this.setTab('portfolio'), setTabPdf: () => this.setTab('pdf'),
+      tabFeedColor: s.activeTab === 'feed' ? '#E2E8F0' : '#64748B', tabFeedBorder: s.activeTab === 'feed' ? accentColor : 'transparent',
+      tabPortfolioColor: s.activeTab === 'portfolio' ? '#E2E8F0' : '#64748B', tabPortfolioBorder: s.activeTab === 'portfolio' ? accentColor : 'transparent',
+      tabPdfColor: s.activeTab === 'pdf' ? '#E2E8F0' : '#64748B', tabPdfBorder: s.activeTab === 'pdf' ? accentColor : 'transparent',
+      showFeed: s.activeTab === 'feed', showPortfolio: s.activeTab === 'portfolio', showPdf: s.activeTab === 'pdf',
+      logsView, positionsView,
+      hasFileUrl: !!s.fileUrl, noFileUrl: !s.fileUrl, fileUrl: s.fileUrl, fileName: s.fileName,
+      pipelineDone: s.pipelineDone, goToResults: this.goToResults,
+      activeNodeLabel: activeNode ? activeNode.label : '—',
+      peekJson: activeNode ? JSON.stringify(activeNode.dataSlice, null, 2) : 'Awaiting pipeline start…',
+      bannerColor: banner.color, bannerBg: banner.bg, bannerBorder: banner.border, bannerLabel: banner.label,
+      summaryString: `${banner.label} — GIRR/delta_charge=${this.fmt(girrDelta)}, Equity/delta_charge=${this.fmt(eqDelta)} | ${this.auditFlags.length} Audit Flags`,
+      metricsView,
+      barData: this.metricsRaw.map(m => ({ name: m.name, delta: m.delta, vega: m.vega, curvature: m.curvature })),
+      donutData: this.metricsRaw.map(m => ({ name: m.name, value: m.delta + m.vega + m.curvature + m.drc + m.rrao, color: m.color })),
+      flagCount: this.auditFlags.length, flagsView,
+      downloadPDF: this.downloadPDF, exportJSON: this.exportJSON, copyStatement: this.copyStatement,
+      hasToast: !!s.toast, toastText: s.toast,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

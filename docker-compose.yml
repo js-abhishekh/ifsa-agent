@@ -1,0 +1,16 @@
+services:
+  ifsa-frtb-auditor:
+    container_name: ifsa-frtb-auditor
+    build: .
+    ports:
+      - "3000:3000"
+      - "8000:8000"
+    volumes:
+      # Persist ChromaDB, uploads, and HuggingFace model cache between runs
+      - ./data/chroma_db:/app/data/chroma_db
+      - ./data/uploads:/app/data/uploads
+      - ./data/hf_cache:/root/.cache/huggingface
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
