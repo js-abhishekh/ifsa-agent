@@ -8,36 +8,56 @@ export interface ResultsBannerProps {
   summary: string;
 }
 
+// Airtable signature-card system:
+//   PASS    → signature-forest-card: deep green #0a2e0e, on-dark white text
+//   WARNING → cream-callout-card: #f5e9d4, ink #181d26
+//   FAIL    → signature-coral-card: #aa2d00, on-dark white text
 export default function ResultsBanner({ status, summary }: ResultsBannerProps) {
-  let style = { dot: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5", text: "#991B1B" };
-  let label = "IFSA COMPLIANCE BREACH / INCOMPLETE";
+  let bg        = "#aa2d00";   // coral — default FAIL
+  let text      = "#ffffff";   // on-dark
+  let dot       = "#ffffff";
+  let label     = "IFSA Compliance Breach / Incomplete";
+  let borderClr = "#aa2d00";
 
   if (status === "PASS") {
-    style = { dot: "#059669", bg: "#F0FDF4", border: "#A7F3D0", text: "#065F46" };
-    label = "IFSA REGULATORY AUDIT PASS";
+    bg        = "#0a2e0e";    // signature forest
+    text      = "#ffffff";
+    dot       = "#39bf45";   // success-border green
+    label     = "IFSA Regulatory Audit — Pass";
+    borderClr = "#0a2e0e";
   } else if (status === "WARNING") {
-    style = { dot: "#D97706", bg: "#FFFBEB", border: "#FDE68A", text: "#92400E" };
-    label = "IFSA AUDIT ATTENTION REQUIRED";
+    bg        = "#f5e9d4";    // signature cream callout
+    text      = "#181d26";   // ink
+    dot       = "#aa2d00";   // coral dot
+    label     = "IFSA Audit — Attention Required";
+    borderClr = "#dddddd";
   }
 
   return (
     <div
-      className="flex w-full flex-row items-center justify-between rounded-xl border p-5 shadow-xs transition-all"
-      style={{ backgroundColor: style.bg, borderColor: style.border }}
+      className="flex w-full flex-row items-center justify-between rounded-[12px] border p-5"
+      style={{ backgroundColor: bg, borderColor: borderClr }}
     >
       <div className="flex flex-col gap-1">
-        <div className="font-[family-name:var(--font-serif)] text-[17px] font-bold tracking-tight" style={{ color: style.text }}>
+        {/* title-sm: 18px/bold */}
+        <div
+          className="font-milligram text-[17px] font-bold tracking-tight leading-snug"
+          style={{ color: text }}
+        >
           {label}
         </div>
-        <div className="font-[family-name:var(--font-mono)] text-[12.5px] text-[#475569]">
+        {/* body-md: 14px/400 */}
+        <div
+          className="font-[family-name:var(--font-mono)] text-[12.5px]"
+          style={{ color: text, opacity: 0.8 }}
+        >
           {summary}
         </div>
       </div>
       <div
-        className="h-[12px] w-[12px] flex-shrink-0 rounded-full shadow-2xs"
-        style={{ backgroundColor: style.dot }}
+        className="h-3 w-3 flex-shrink-0 rounded-full"
+        style={{ backgroundColor: dot }}
       />
     </div>
   );
 }
-

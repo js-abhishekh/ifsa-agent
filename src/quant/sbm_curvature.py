@@ -18,6 +18,7 @@ Cross-bucket: sqrt(max(0, Σ K_b^2 + Σ_{b≠c} γ_bc^2 S_b S_c))
 """
 import math
 from src.graph.state import PortfolioPosition, ExtractedLogic, CalculatedMetric
+from src.quant.risk_weights import DEFAULT_INTRA_CORRELATIONS
 
 
 def _cvr(position: PortfolioPosition) -> float:
@@ -34,11 +35,13 @@ def _cvr(position: PortfolioPosition) -> float:
 def _bucket_curvature_kb(
     positions: list[PortfolioPosition],
     correlations: dict[str, float],
+    risk_class: str | None = None,
 ) -> float:
     """K_b for curvature: uses ρ_kl² (squared correlations) per MAR21.6."""
     cvr_map = {p.instrument_id: _cvr(p) for p in positions}
     ids = [p.instrument_id for p in positions]
     rfs = {p.instrument_id: p.risk_factor for p in positions}
+    rc = risk_class or (positions[0].risk_class if positions else None)
 
     sum_sq = sum(cvr_map[i] ** 2 for i in ids)
 
@@ -47,12 +50,19 @@ def _bucket_curvature_kb(
         for l_idx in range(k_idx + 1, len(ids)):
             k, l = ids[k_idx], ids[l_idx]
             rf_k, rf_l = rfs[k], rfs[l]
-            rho = (
-                correlations.get(f"{rf_k}_{rf_l}")
-                or correlations.get(f"{rf_l}_{rf_k}")
-                or correlations.get("rho_intra_default")
-                or correlations.get("rho_default", 1.0)
-            )
+            if rf_k == rf_l:
+                rho = correlations.get("rho_intra_same_issuer", 1.0)
+            else:
+                # Use explicit is-None checks: a legitimate zero correlation must
+                # not be treated as "missing" by Python's or short-circuit.
+                rho = None
+                for _key in (f"{rf_k}_{rf_l}", f"{rf_l}_{rf_k}", "rho_intra_default", "rho_default"):
+                    _val = correlations.get(_key)
+                    if _val is not None:
+                        rho = _val
+                        break
+                if rho is None:
+                    rho = DEFAULT_INTRA_CORRELATIONS.get(rc, 0.50)
             cross += 2 * (rho ** 2) * cvr_map[k] * cvr_map[l]
 
     return math.sqrt(max(sum_sq + cross, 0.0))
@@ -77,7 +87,7 @@ def sbm_curvature_charge(
     bucket_sb_values: dict[str, float] = {}
 
     for bucket, bpos in by_bucket.items():
-        kb = _bucket_curvature_kb(bpos, logic.correlations)
+        kb = _bucket_curvature_kb(bpos, logic.correlations, risk_class=logic.risk_class)
         raw_sum = sum(_cvr(p) for p in bpos)
         sb = max(min(raw_sum, kb), -kb)
         bucket_kb_values[bucket] = kb

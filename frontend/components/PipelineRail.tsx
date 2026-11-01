@@ -7,59 +7,68 @@ export interface PipelineRailProps {
   nodes: NodeState[];
 }
 
+// Airtable topic-filter-rail: 240px surface-soft bg, editorial hierarchy
 export default function PipelineRail({ nodes }: PipelineRailProps) {
   return (
-    <div className="w-[280px] flex-shrink-0 border-r border-[#E2E8F0] bg-[#FAF9F6] px-4 py-5 overflow-y-auto">
-      <div className="mb-[16px] border-b border-[#E2E8F0] pb-2 font-[family-name:var(--font-mono)] text-[10.5px] font-bold tracking-widest text-[#B45309] uppercase">
-        IFSA AUDIT PIPELINE AGENTS
+    <div className="w-[260px] flex-shrink-0 border-r border-[#dddddd] bg-[#f8fafc] px-4 py-5 overflow-y-auto">
+      {/* Section header — label-md 16px/500 */}
+      <div className="mb-4 border-b border-[#dddddd] pb-3 text-[11px] font-[600] tracking-widest text-[#41454d] uppercase font-[family-name:var(--font-mono)]">
+        Pipeline Agents
       </div>
-      <div className="flex flex-col gap-2">
-        {nodes.map((node) => {
-          const isActive = node.status === "active";
-          const isDone = node.status === "done";
-          const isError = node.status === "error";
-          const isPending = node.status === "pending";
 
-          let dotColor = "#CBD5E1";
-          let borderClass = "border-transparent";
-          let bgClass = "bg-transparent";
-          let labelColor = "#64748B";
+      <div className="flex flex-col gap-1.5">
+        {nodes.map((node) => {
+          const isActive  = node.status === "active";
+          const isDone    = node.status === "done";
+          const isError   = node.status === "error";
+
+          // Airtable signature surface color mapping
+          let dotColor   = "#dddddd";        // pending — hairline
+          let rowBg      = "bg-transparent";
+          let rowBorder  = "border-transparent";
+          let labelColor = "#9297a0";        // muted
 
           if (isActive) {
-            dotColor = "#D97706";
-            borderClass = "border-[#F59E0B]/40";
-            bgClass = "bg-[#FFFBEB]";
-            labelColor = "#0F172A";
+            dotColor   = "#aa2d00";          // signature coral — brand voltage
+            rowBg      = "bg-[#f5e9d4]";     // cream callout surface
+            rowBorder  = "border-[#aa2d00]/30";
+            labelColor = "#181d26";          // ink
           } else if (isDone) {
-            dotColor = "#059669";
-            borderClass = "border-transparent";
-            bgClass = "bg-white/60";
-            labelColor = "#1E293B";
+            dotColor   = "#006400";          // success
+            rowBg      = "bg-white";
+            rowBorder  = "border-[#dddddd]";
+            labelColor = "#333840";          // body
           } else if (isError) {
-            dotColor = "#DC2626";
-            borderClass = "border-[#FCA5A5]";
-            bgClass = "bg-[#FEF2F2]";
-            labelColor = "#991B1B";
+            dotColor   = "#aa2d00";
+            rowBg      = "bg-[#aa2d00]";     // coral signature card
+            rowBorder  = "border-[#aa2d00]";
+            labelColor = "#ffffff";          // on-dark
           }
 
           return (
             <div
               key={node.id}
-              className={`flex flex-row items-start gap-[12px] rounded-lg border p-2.5 transition-all shadow-2xs ${borderClass} ${bgClass} ${
+              className={`flex flex-row items-start gap-3 rounded-[10px] border p-2.5 transition-all ${rowBorder} ${rowBg} ${
                 isActive ? "animate-pulse-glow" : ""
               }`}
             >
-              <div className="flex w-[20px] flex-shrink-0 justify-center pt-[5px]">
+              {/* Status dot */}
+              <div className="flex w-5 flex-shrink-0 justify-center pt-[6px]">
                 <div
-                  className={`h-[8px] w-[8px] rounded-full ${isActive ? "animate-pulse-dot" : ""}`}
+                  className={`h-2 w-2 rounded-full ${isActive ? "animate-pulse-dot" : ""}`}
                   style={{ backgroundColor: dotColor }}
                 />
               </div>
+
+              {/* Label + description */}
               <div className="flex flex-col">
-                <span className={`text-[13px] font-semibold ${isActive ? "font-bold" : ""}`} style={{ color: labelColor }}>
+                <span
+                  className="font-milligram text-[13px] leading-snug"
+                  style={{ color: labelColor, fontWeight: isActive ? 500 : 400 }}
+                >
                   {node.label}
                 </span>
-                <span className="text-[11.5px] leading-snug text-[#64748B] mt-0.5">
+                <span className="mt-0.5 text-[11.5px] leading-snug text-[#9297a0]">
                   {node.desc}
                 </span>
               </div>
@@ -70,4 +79,3 @@ export default function PipelineRail({ nodes }: PipelineRailProps) {
     </div>
   );
 }
-

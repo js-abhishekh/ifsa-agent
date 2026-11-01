@@ -146,6 +146,47 @@ class TestBucketKb:
         inner = 1375**2 + 880**2 + 2 * 0.905 * 1375 * (-880)
         assert kb == pytest.approx(math.sqrt(max(inner, 0.0)), rel=1e-4)
 
+    def test_statutory_equity_correlation_fallback(self):
+        """When no correlation is provided, Equity distinct names use Basel MAR21.76 statutory 0.25 instead of 1.0."""
+        pos = [
+            PortfolioPosition(instrument_id="EQ_1", risk_class="Equity", bucket="EM_LargeCap", risk_factor="TATA", sensitivity=100.0),
+            PortfolioPosition(instrument_id="EQ_2", risk_class="Equity", bucket="EM_LargeCap", risk_factor="INFY", sensitivity=100.0),
+        ]
+        ws = {"EQ_1": 55.0, "EQ_2": 55.0}  # assuming 0.55 RW
+        # Empty correlations dict
+        kb = bucket_kb(pos, ws, {}, risk_class="Equity")
+        # inner = 55^2 + 55^2 + 2 * 0.25 * 55 * 55 = 3025 + 3025 + 1512.5 = 7562.5
+        expected = math.sqrt(7562.5)
+        assert kb == pytest.approx(expected, rel=1e-4)
+
+    def test_statutory_csr_correlation_fallback(self):
+        """When no correlation is provided, CSR distinct issuers use Basel MAR21.58 statutory 0.35 instead of 1.0."""
+        pos = [
+            PortfolioPosition(instrument_id="BOND_1", risk_class="CSR_NonSec", bucket="IG_Corp", risk_factor="ISSUER_A", sensitivity=1000.0),
+            PortfolioPosition(instrument_id="BOND_2", risk_class="CSR_NonSec", bucket="IG_Corp", risk_factor="ISSUER_B", sensitivity=1000.0),
+        ]
+        ws = {"BOND_1": 20.0, "BOND_2": 20.0}
+        kb = bucket_kb(pos, ws, {}, risk_class="CSR_NonSec")
+        # inner = 20^2 + 20^2 + 2 * 0.35 * 20 * 20 = 400 + 400 + 280 = 1080
+        expected = math.sqrt(1080.0)
+        assert kb == pytest.approx(expected, rel=1e-4)
+
+    def test_zero_correlation_not_bypassed(self):
+        """An explicit rho=0.0 in the correlations dict must be honoured, not treated as missing.
+        Old or-chain bug: correlations.get("5Y_10Y") == 0.0 was falsy, so it would
+        fall through to the statutory default (0.80 for GIRR). The is-None fix prevents this.
+        """
+        pos = [
+            PortfolioPosition(instrument_id="A", risk_class="GIRR", bucket="USD", risk_factor="5Y", sensitivity=100.0),
+            PortfolioPosition(instrument_id="B", risk_class="GIRR", bucket="USD", risk_factor="10Y", sensitivity=100.0),
+        ]
+        ws = {"A": 1.0, "B": 1.0}
+        # Explicit zero correlation between the two tenors → perfect offset → K_b = 0
+        kb = bucket_kb(pos, ws, {"5Y_10Y": 0.0}, risk_class="GIRR")
+        # inner = 1^2 + 1^2 + 2*0.0*1*1 = 2 → K_b = sqrt(2)
+        assert kb == pytest.approx(math.sqrt(2.0), rel=1e-4)
+
+
 
 # ── TestCrossBucketDelta ──────────────────────────────────────────────────────
 class TestCrossBucketDelta:

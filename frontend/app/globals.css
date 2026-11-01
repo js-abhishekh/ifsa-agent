@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
+/* ─── Numbers in Milligram Use Inter ─────────────────────────────────────── */
+@font-face {
+  font-family: "Milligram";
+  src: local("Inter"), local("Segoe UI"), sans-serif;
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0024, U+20B9, U+0025, U+0023, U+002B, U+002D;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MilligramTrial";
+  src: local("Inter"), local("Segoe UI"), sans-serif;
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0024, U+20B9, U+0025, U+0023, U+002B, U+002D;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* ─── Milligram Font Declarations (Served from /fonts) ───────────────────── */
+@font-face {
+  font-family: "Milligram";
+  src: local("MilligramTrial"),
+       local("Milligram Trial"),
+       local("Milligram"),
+       url("/fonts/Milligram-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Milligram";
+  src: local("MilligramTrial Medium"),
+       local("Milligram Trial Medium"),
+       local("Milligram Medium"),
+       url("/fonts/Milligram-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Milligram";
+  src: local("MilligramTrial Bold"),
+       local("Milligram Trial Bold"),
+       local("Milligram Bold"),
+       url("/fonts/Milligram-Bold.ttf") format("truetype");
+  font-weight: 600 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Airtable Design System — Font Variables ─────────────────────────────── */
 :root {
   --font-inter: "Inter", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-serif: "Newsreader", Georgia, serif;
+  --font-mono: var(--font-inter), "Inter", sans-serif;
+  --font-milligram: "Milligram", "MilligramTrial", "Milligram Trial", "The Milligram", var(--font-inter), sans-serif;
+  --font-serif: var(--font-milligram); /* Milligram for display/editorial titles */
+
+  /* Airtable color tokens */
+  --color-primary: #181d26;
+  --color-primary-active: #0d1218;
+  --color-ink: #181d26;
+  --color-body: #333840;
+  --color-muted: #41454d;
+  --color-hairline: #dddddd;
+  --color-canvas: #ffffff;
+  --color-surface-soft: #f8fafc;
+  --color-surface-strong: #e0e2e6;
+  --color-surface-dark: #181d26;
+  --color-signature-coral: #aa2d00;
+  --color-signature-forest: #0a2e0e;
+  --color-signature-cream: #f5e9d4;
+  --color-signature-peach: #fcab79;
+  --color-signature-mint: #a8d8c4;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #ffffff;
+  --color-link: #1b61c9;
+  --color-info-border: #458fff;
+  --color-success: #006400;
+  --color-success-border: #39bf45;
 }
 
 body {
   margin: 0;
-  background-color: #FAF9F6;
-  color: #0F172A;
+  background-color: #ffffff;
+  color: #181d26;
   font-family: var(--font-inter);
+  font-size: 14px;
+  line-height: 1.25;
 }
 
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.35); }
-  50% { box-shadow: 0 0 0 6px rgba(217, 119, 6, 0.12); }
+/* ─── Headings & Titles — Milligram Bold ─────────────────────────────────── */
+h1, h2, h3, h4, h5, h6,
+.font-heading {
+  font-family: "Milligram", "MilligramTrial", "Milligram Trial", sans-serif !important;
+  font-weight: 700 !important;
 }
 
+.font-milligram {
+  font-family: "Milligram", "MilligramTrial", "Milligram Trial", sans-serif !important;
+}
+
+/* ─── Numbers, Figures & Currency in UI — Inter ──────────────────────────── */
+.font-mono,
+.font-number,
+[class*="font-[family-name:var(--font-mono)]"],
+input[type="number"],
+code {
+  font-family: var(--font-inter), "Inter", -apple-system, sans-serif !important;
+  font-feature-settings: "tnum" 1, "cv05" 1;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────────*/
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
@@ -29,27 +124,24 @@ body {
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50%       { opacity: 0.35; }
 }
 
-.animate-fade-slide-up {
-  animation: fadeSlideUp 0.3s ease forwards;
+/* Coral glow for active pipeline node */
+@keyframes coralGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(170, 45, 0, 0.2); }
+  50%       { box-shadow: 0 0 0 5px rgba(170, 45, 0, 0.06); }
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 2s ease-in-out infinite;
-}
+.animate-fade-slide-up { animation: fadeSlideUp 0.3s ease forwards; }
+.animate-pulse-glow    { animation: coralGlow 2s ease-in-out infinite; }
+.animate-pulse-dot     { animation: pulse-dot 1.4s ease-in-out infinite; }
 
-.animate-pulse-dot {
-  animation: pulse-dot 1.4s ease-in-out infinite;
-}
+/* ─── Scrollbar — Airtable neutral ──────────────────────────────────────────*/
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: #f8fafc; }
+::-webkit-scrollbar-thumb  { background: #dddddd; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9297a0; }
 
-/* Scrollbar styling for Light Editorial */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #F1F5F9; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-
-/* Selection */
-::selection { background: #FDE68A; color: #0F172A; }
-
+/* ─── Selection ──────────────────────────────────────────────────────────────*/
+::selection { background: #e0e2e6; color: #181d26; }

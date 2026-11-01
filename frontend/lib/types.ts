@@ -68,9 +68,7 @@ export type PipelineNode =
   | "retrieve"
   | "extract_logic"
   | "execute_quant"
-  | "validate"
-  | "retry_bump"
-  | "request_missing_inputs";
+  | "validate";
 
 export type NodeStatus = "pending" | "active" | "done" | "error";
 

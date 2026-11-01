@@ -26,8 +26,8 @@ COPY backend/requirements.txt ./backend-requirements.txt
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 RUN pip install --default-timeout=1000 --no-cache-dir -r requirements.txt -r backend-requirements.txt
 
-# HF Token for authenticated, fast downloads
-ENV HF_TOKEN=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
+# HF Token should be supplied via .env or environment variables if needed
+# ENV HF_TOKEN=
 
 # Copy Python source code
 COPY src/ ./src/

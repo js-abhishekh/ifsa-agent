@@ -33,6 +33,13 @@ GIRR_RISK_WEIGHTS: Dict[str, float] = {
     "30Y":   0.011,
     "inflation": 0.016,
     "cross_currency_basis": 0.016,
+    # Currency bucket and baseline defaults (standard BCBS 1Y/5Y intermediate rate)
+    "default": 0.016,
+    "INR":     0.016,
+    "USD":     0.016,
+    "EUR":     0.016,
+    "GBP":     0.016,
+    "JPY":     0.016,
 }
 
 # Within-bucket (same currency) tenor correlations (ρ_kl = exp(-α|T_k - T_l|))
@@ -71,6 +78,7 @@ EQUITY_RISK_WEIGHTS: Dict[str, float] = {
     "DM_LargeCap": 0.35,
     "EM_SmallCap": 0.70,
     "DM_SmallCap": 0.50,
+    "default":     0.55,
 }
 
 EQUITY_CORRELATIONS: Dict[str, float] = {
@@ -147,11 +155,26 @@ COMMODITY_CORRELATIONS: Dict[str, float] = {
     "gamma_bc":       0.20,
 }
 
+# ── CSR Securitisation (MAR21.63–21.70) ────────────────────────────────────
+CSR_SEC_RISK_WEIGHTS: Dict[str, float] = {
+    "1": 0.016,   # Senior IG
+    "2": 0.025,   # Senior mezzanine
+    "3": 0.050,   # Non-senior IG
+    "4": 0.100,   # Non-senior HY
+    "default": 0.030,
+}
+
+CSR_SEC_CORRELATIONS: Dict[str, float] = {
+    "rho_intra": 0.40,
+    "gamma_bc":  0.0,
+}
+
 # ── Master lookup ──────────────────────────────────────────────────────────────
 RISK_WEIGHTS_BY_CLASS: Dict[str, Dict[str, float]] = {
     "GIRR":       GIRR_RISK_WEIGHTS,
     "Equity":     EQUITY_RISK_WEIGHTS,
     "CSR_NonSec": CSR_NONSEC_RISK_WEIGHTS,
+    "CSR_Sec":    CSR_SEC_RISK_WEIGHTS,
     "FX":         FX_RISK_WEIGHTS,
     "Commodity":  COMMODITY_RISK_WEIGHTS,
 }
@@ -160,6 +183,18 @@ CORRELATIONS_BY_CLASS: Dict[str, Dict[str, float]] = {
     "GIRR":       GIRR_CORRELATIONS,
     "Equity":     EQUITY_CORRELATIONS,
     "CSR_NonSec": CSR_NONSEC_CORRELATIONS,
+    "CSR_Sec":    CSR_SEC_CORRELATIONS,
     "FX":         FX_CORRELATIONS,
     "Commodity":  COMMODITY_CORRELATIONS,
+}
+
+# ── Statutory default intra-bucket correlations (MAR21) ──────────────────────
+# Used when specific pair-wise correlations are not defined between different names/grades.
+DEFAULT_INTRA_CORRELATIONS: Dict[str, float] = {
+    "GIRR":       0.80,   # MAR21.47 general yield curve baseline
+    "Equity":     0.25,   # MAR21.76 different names in same bucket
+    "CSR_NonSec": 0.35,   # MAR21.58 different issuers in same bucket
+    "CSR_Sec":    0.40,   # MAR21.66 intra-bucket securitisation
+    "Commodity":  0.40,   # MAR21.84 different commodity sub-grades
+    "FX":         0.60,   # MAR21.90
 }

@@ -16,9 +16,7 @@ const NODE_ORDER: PipelineNode[] = [
   "retrieve",
   "extract_logic",
   "execute_quant",
-  "validate",
-  "retry_bump",
-  "request_missing_inputs"
+  "validate"
 ];
 
 const NODE_META: Record<PipelineNode, { label: string; desc: string }> = {
@@ -26,9 +24,7 @@ const NODE_META: Record<PipelineNode, { label: string; desc: string }> = {
   retrieve: { label: "Retrieve Rules", desc: "Fetching Basel MAR rules from ChromaDB vector store" },
   extract_logic: { label: "Extract Logic", desc: "Extracting risk weights & correlation matrices via LLM" },
   execute_quant: { label: "Execute Quant Core", desc: "Executing SBM bucket aggregation formulas" },
-  validate: { label: "Validate", desc: "Validating mathematical consistency & output thresholds" },
-  retry_bump: { label: "Retry Needed", desc: "Missing inputs detected, triggering pipeline retry" },
-  request_missing_inputs: { label: "Manual Input Req.", desc: "Pipeline blocked, manual intervention required" }
+  validate: { label: "Validate", desc: "Validating mathematical consistency & output thresholds" }
 };
 
 function makeId() {
@@ -58,19 +54,27 @@ function nodeDataToLogs(node: string, data: Record<string, unknown>): LogEntry[]
 
   if (node === "retrieve") {
     const count = (data.retrieved_count as number) ?? 0;
-    entries.push({ id: makeId(), type: "success", text: `Retrieved ${count} regulatory clauses from vector store`, node: "Retrieve Rules", timestamp: ts });
+    if (count > 0) {
+      entries.push({ id: makeId(), type: "success", text: `Retrieved ${count} regulatory clauses from vector store`, node: "Retrieve Rules", timestamp: ts });
+    } else {
+      entries.push({ id: makeId(), type: "info", text: "No portfolio positions; skipped regulatory clause retrieval", node: "Retrieve Rules", timestamp: ts });
+    }
   }
 
   if (node === "extract_logic") {
     const count = (data.extracted_count as number) ?? 0;
     const complete = data.is_complete as boolean;
-    entries.push({
-      id: makeId(), type: complete ? "success" : "flag",
-      text: complete
-        ? `Risk weights & correlations resolved for ${count} risk class(es)`
-        : `Partial extraction — ${count} risk class(es) incomplete, triggering retry`,
-      node: "Extract Logic", timestamp: ts,
-    });
+    if (count > 0) {
+      entries.push({
+        id: makeId(), type: complete ? "success" : "flag",
+        text: complete
+          ? `Risk weights & correlations resolved for ${count} risk class(es)`
+          : `Partial extraction — ${count} risk class(es) incomplete`,
+        node: "Extract Logic", timestamp: ts,
+      });
+    } else {
+      entries.push({ id: makeId(), type: "info", text: "No active risk classes in portfolio; skipped parameter extraction", node: "Extract Logic", timestamp: ts });
+    }
   }
 
   if (node === "execute_quant") {
@@ -153,7 +157,7 @@ export function usePipelineSSE(runId: string | null) {
       const payload = JSON.parse(e.data) as { node: string; data: Record<string, unknown> };
       const { node, data } = payload;
 
-      // Mark current node done, next active
+      // Mark current node done, advance to next
       setNodeStatus(node, "done", data);
       const currentIdx = NODE_ORDER.indexOf(node as PipelineNode);
       if (currentIdx >= 0 && currentIdx < NODE_ORDER.length - 1) {
@@ -183,8 +187,15 @@ export function usePipelineSSE(runId: string | null) {
       const portfolioInputs = payload.portfolio_inputs ?? [];
 
       let status: ComplianceStatus = "PASS";
-      if (valErrors.some((v: { severity: string }) => v.severity === "blocking")) status = "INCOMPLETE";
-      else if (auditFlags.length > 0 || valErrors.some((v: { severity: string }) => v.severity === "warning")) status = "WARNING";
+      if (portfolioInputs.length === 0 && metrics.length === 0) {
+        status = auditFlags.length > 0 ? "ERROR" : "INCOMPLETE";
+      } else if (valErrors.some((v: { severity: string }) => v.severity === "blocking")) {
+        status = "INCOMPLETE";
+      } else if (auditFlags.length > 0) {
+        status = "ERROR";
+      } else if (valErrors.some((v: { severity: string }) => v.severity === "warning")) {
+        status = "WARNING";
+      }
 
       setFinalResults({ compliance_status: status, compliance_summary: summary, calculated_metrics: metrics, audit_flags: auditFlags, validation_errors: valErrors, portfolio_inputs: portfolioInputs });
       setPipelineDone(true);

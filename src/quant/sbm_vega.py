@@ -55,7 +55,7 @@ def sbm_vega_charge(
 
     for bucket, bpos in by_bucket.items():
         ws = compute_vega_weighted_sensitivities(bpos, logic.risk_weights)
-        kb = bucket_kb(bpos, ws, logic.correlations)
+        kb = bucket_kb(bpos, ws, logic.correlations, risk_class=logic.risk_class)
         sb = _bucket_sb(bpos, ws, kb)
         bucket_kb_values[bucket] = kb
         bucket_sb_values[bucket] = sb

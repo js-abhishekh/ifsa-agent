@@ -14,35 +14,16 @@ import pymupdf
 from src.graph.state import AgentState
 from src.config import (
     LLM_MODEL,
-    FALLBACK_LLM_MODEL,
-    GEMINI_API_KEY,
-    OPENAI_API_KEY,
-    OPENROUTER_API_KEY,
-    LLM_BASE_URL,
+    FALLBACK_MODEL,
+    create_llm_client,
 )
 
-_llm = None
-_llm_available = False
-
-try:
-    from langchain_openai import ChatOpenAI
-    api_key = GEMINI_API_KEY or OPENROUTER_API_KEY or OPENAI_API_KEY
-    if api_key:
-        kwargs = {
-            "model": LLM_MODEL,
-            "api_key": api_key,
-            "temperature": 0,
-            "request_timeout": 120,
-        }
-        if LLM_BASE_URL:
-            kwargs["base_url"] = LLM_BASE_URL
-        
-        _llm = ChatOpenAI(**kwargs)
-        _llm_available = True
-        print(f"[document_auditor] LLM initialized: {LLM_MODEL}")
-except Exception as e:
-    print(f"[document_auditor] LLM init note: {e} - auditor bypassed.")
-    _llm_available = False
+_llm = create_llm_client(is_fallback=False)
+_llm_available = _llm is not None
+if _llm_available:
+    print(f"[document_auditor] LLM initialized: {LLM_MODEL}")
+else:
+    print("[document_auditor] LLM not available - auditor bypassed.")
 
 
 AUDITOR_PROMPT = """\
@@ -178,10 +159,11 @@ async def document_auditor_node(state: AgentState) -> AgentState:
         import time
         max_retries = 3
         response = None
+        current_llm = _llm
         for attempt in range(max_retries):
             try:
                 response = await asyncio.to_thread(
-                    _llm.invoke,
+                    current_llm.invoke,
                     [
                         {"role": "system", "content": AUDITOR_PROMPT},
                         {"role": "user", "content": f"Document Text:\n{full_text}"},
@@ -189,14 +171,10 @@ async def document_auditor_node(state: AgentState) -> AgentState:
                 )
                 break
             except Exception as e:
-                print(f"[document_auditor] Attempt {attempt+1} failed ({e}). Switching to fallback model {FALLBACK_LLM_MODEL}...")
-                _llm = ChatOpenAI(
-                    model=FALLBACK_LLM_MODEL,
-                    api_key=GEMINI_API_KEY or OPENROUTER_API_KEY or OPENAI_API_KEY,
-                    base_url=LLM_BASE_URL,
-                    temperature=0,
-                    request_timeout=120,
-                )
+                print(f"[document_auditor] Attempt {attempt+1} failed ({e}). Switching to fallback model ({FALLBACK_MODEL})...")
+                fallback_client = create_llm_client(is_fallback=True)
+                if fallback_client:
+                    current_llm = fallback_client
                 if attempt < max_retries - 1:
                     await asyncio.sleep(2)
                 else:

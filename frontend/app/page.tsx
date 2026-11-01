@@ -8,9 +8,9 @@ import { UploadCloud, FileText, ArrowRight, ShieldCheck, PieChart, Sparkles } fr
 
 export default function Home() {
   const router = useRouter();
-  const [dragOver, setDragOver] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [dragOver, setDragOver]   = useState(false);
+  const [loading, setLoading]     = useState(false);
+  const [errorMsg, setErrorMsg]   = useState<string | null>(null);
 
   const handleFile = async (file: File) => {
     if (file.type !== "application/pdf") {
@@ -32,28 +32,11 @@ export default function Home() {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = () => setDragOver(false);
-
-  const openFilePicker = () => {
-    document.getElementById("pdf-upload")?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFile(file);
-  };
+  const handleDrop       = (e: React.DragEvent) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); };
+  const handleDragOver   = (e: React.DragEvent) => { e.preventDefault(); setDragOver(true); };
+  const handleDragLeave  = () => setDragOver(false);
+  const openFilePicker   = () => document.getElementById("pdf-upload")?.click();
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { const f = e.target.files?.[0]; if (f) handleFile(f); };
 
   const startDemo = async () => {
     setErrorMsg(null);
@@ -69,43 +52,53 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#FAF9F6] text-[#0F172A]">
+    <div className="flex min-h-screen flex-col bg-white text-[#181d26]">
       <Navbar screenLabel="PORTFOLIO UPLOAD" />
-      
-      <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 py-12">
-        {/* Top Editorial Banner / Header */}
-        <div className="w-full max-w-[840px] text-center">
-          <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-[#B45309]/30 bg-[#FFFBEB] px-3.5 py-1 font-[family-name:var(--font-mono)] text-[11px] font-semibold tracking-wider text-[#B45309] uppercase shadow-2xs">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span className="rounded bg-[#B45309] text-white px-1.5 py-0.5 font-bold">IFSA</span> REGULATORY INTELLIGENCE & AUDIT ENGINE
+
+      {/* ── Hero Band — white canvas, 96px vertical padding ─────────────────── */}
+      <main className="flex flex-1 flex-col items-center px-6 py-24 gap-10">
+
+        {/* Hero copy */}
+        <div className="w-full max-w-[800px] text-center">
+          {/* Hairline badge */}
+          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-[#dddddd] bg-white px-4 py-1.5 font-[family-name:var(--font-mono)] text-[11px] font-[500] tracking-wider text-[#41454d] uppercase">
+            <span className="inline-block h-2 w-2 rounded-full bg-[#aa2d00]" />
+            IFSA · FRTB-SA Regulatory Audit Engine · BCBS 352
           </div>
 
-          <h1 className="font-[family-name:var(--font-serif)] text-[42px] font-normal leading-[1.15] text-[#0F172A] md:text-[52px]">
-            IFSA's FRTB-SA Auditor <br />
-            <span className="italic font-light text-[#B45309]">Capital Calculation & Compliance Audit</span>
+          {/* display-lg: 40px / weight 700 — Milligram Bold */}
+          <h1 className="font-milligram text-[40px] font-bold leading-[1.2] text-[#181d26]">
+            IFSA's FRTB-SA Auditor
           </h1>
+          <p className="font-milligram mt-2 text-[32px] font-bold leading-[1.2] text-[#333840]">
+            Capital Calculation &amp; Compliance Audit
+          </p>
 
-          <p className="mx-auto mt-4 max-w-[660px] text-[15.5px] leading-relaxed text-[#475569]">
-            Submit any institutional Bank Disclosure or Trading Book PDF to IFSA's FRTB-SA Auditor. Our autonomous agent extracts sensitivity risk vectors, computes BCBS capital charges, and validates disclosures against Basel III regulatory mandates.
+          {/* body-md: 14px/400 */}
+          <p className="mx-auto mt-6 max-w-[600px] text-[14px] leading-[1.6] text-[#41454d]">
+            Submit any institutional Bank Disclosure or Trading Book PDF. IFSA's autonomous
+            agent extracts sensitivity risk vectors, computes BCBS capital charges, and validates
+            disclosures against Basel&nbsp;III regulatory mandates.
           </p>
         </div>
 
+        {/* Error — cream callout */}
         {errorMsg && (
-          <div className="w-full max-w-[620px] rounded-lg border border-[#F59E0B]/40 bg-[#FFFBEB] p-4 text-[13.5px] font-medium text-[#92400E] shadow-2xs">
-            ⚠️ {errorMsg}
+          <div className="w-full max-w-[600px] rounded-[10px] border border-[#dddddd] bg-[#f5e9d4] p-4 text-[13.5px] text-[#181d26]">
+            ⚠ {errorMsg}
           </div>
         )}
 
-        {/* Financial Dropzone Card */}
+        {/* ── Dropzone — text-input + demo-grid-card style ─────────────────── */}
         <div
           onClick={openFilePicker}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          className={`group flex h-[220px] w-full max-w-[640px] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-6 transition-all shadow-xs ${
+          className={`group flex h-[220px] w-full max-w-[600px] cursor-pointer flex-col items-center justify-center gap-4 rounded-[10px] border-2 border-dashed p-6 transition-all ${
             dragOver
-              ? "border-[#B45309] bg-[#FFFBEB]"
-              : "border-[#CBD5E1] bg-white hover:border-[#B45309] hover:bg-[#FFFBEB]/40 hover:shadow-md"
+              ? "border-[#181d26] bg-[#f8fafc]"
+              : "border-[#dddddd] bg-white"
           }`}
         >
           <input
@@ -115,26 +108,31 @@ export default function Home() {
             className="hidden"
             onChange={handleFileChange}
           />
+
           {loading ? (
-            <div className="flex flex-col items-center justify-center gap-3">
-              <div className="h-9 w-9 animate-spin rounded-full border-3 border-[#B45309] border-t-transparent"></div>
-              <span className="font-[family-name:var(--font-serif)] text-[16px] font-medium text-[#0F172A]">
+            <div className="flex flex-col items-center gap-3">
+              {/* Spinner — coral accent */}
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#aa2d00] border-t-transparent" />
+              <span className="text-[16px] font-[400] text-[#181d26]">
                 Extracting trading book sensitivities…
               </span>
-              <span className="font-[family-name:var(--font-mono)] text-[12px] text-[#64748B]">
+              <span className="font-[family-name:var(--font-mono)] text-[12px] text-[#9297a0]">
                 Parsing GIRR, Equity, FX, and Credit Spread Risk vectors
               </span>
             </div>
           ) : (
             <>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] transition-transform group-hover:scale-105 group-hover:border-[#B45309]/40 group-hover:text-[#B45309]">
-                <UploadCloud className="h-6 w-6" />
+              {/* Upload icon — circular button */}
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dddddd] bg-[#f8fafc] text-[#9297a0] transition-colors group-active:border-[#181d26] group-active:text-[#181d26]">
+                <UploadCloud className="h-5 w-5" />
               </div>
               <div className="text-center">
-                <span className="font-[family-name:var(--font-serif)] text-[17px] font-semibold text-[#0F172A]">
-                  Drag & drop a Bank PDF, or <span className="text-[#B45309] underline decoration-[#B45309]/40 underline-offset-4">browse files</span>
+                {/* label-md: 16px/500 */}
+                <span className="text-[16px] font-[500] text-[#181d26]">
+                  Drag &amp; drop a Bank PDF, or{" "}
+                  <span className="underline underline-offset-4 decoration-[#181d26]/30">browse files</span>
                 </span>
-                <p className="mt-1 font-[family-name:var(--font-mono)] text-[11.5px] text-[#64748B]">
+                <p className="mt-1.5 font-[family-name:var(--font-mono)] text-[11.5px] text-[#9297a0]">
                   Bank Disclosures · Trading Book Annexes · Regulatory Circulars
                 </p>
               </div>
@@ -142,62 +140,94 @@ export default function Home() {
           )}
         </div>
 
-        {/* Sample Execution Button */}
+        {/* ── Demo CTA — button-secondary style ────────────────────────────── */}
         <button
           onClick={(e) => { e.stopPropagation(); startDemo(); }}
           disabled={loading}
-          className="group inline-flex items-center gap-2 rounded-full border border-[#E2E8F0] bg-white px-5 py-2.5 font-[family-name:var(--font-mono)] text-[13px] font-semibold text-[#0F172A] shadow-xs transition-all hover:border-[#B45309] hover:bg-[#FFFBEB] hover:text-[#92400E] disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-[12px] border border-[#dddddd] bg-white px-5 py-3 text-[14px] font-[500] text-[#181d26] transition-colors active:bg-[#e0e2e6] disabled:opacity-40"
         >
-          <FileText className="h-4 w-4 text-[#B45309]" />
-          <span>Execute Sample Analysis (Punjab National Bank Trading Book)</span>
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+          <FileText className="h-4 w-4 text-[#9297a0]" />
+          Execute Sample Analysis (Punjab National Bank Trading Book)
+          <ArrowRight className="h-3.5 w-3.5 text-[#9297a0]" />
         </button>
 
-        {/* Editorial Feature Grid with Fine Rule Lines */}
-        <div className="mt-4 w-full max-w-[920px] border-t border-[#E2E8F0] pt-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col gap-2 rounded-lg border border-[#E2E8F0] bg-white p-5 shadow-2xs transition-shadow hover:shadow-xs">
+        {/* ── Signature Coral Band — brand voltage separator ───────────────── */}
+        <div className="w-full max-w-[920px] rounded-[12px] bg-[#aa2d00] px-12 py-10">
+          <p className="text-[13px] font-[family-name:var(--font-mono)] font-[500] uppercase tracking-widest text-white/70 mb-3">
+            What IFSA Auditor does
+          </p>
+          <p className="font-milligram text-[32px] font-bold leading-[1.2] text-white">
+            Production-grade FRTB capital verification at prototype speed.
+          </p>
+        </div>
+
+        {/* ── Feature grid — demo-grid-card style ─────────────────────────── */}
+        <div className="w-full max-w-[920px]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            {/* Card 1 — surface-soft */}
+            <div className="flex flex-col gap-3 rounded-[10px] border border-[#dddddd] bg-[#f8fafc] p-5">
               <div className="flex items-center gap-2">
-                <span className="font-[family-name:var(--font-mono)] text-[12px] font-bold text-[#B45309]">01</span>
-                <ShieldCheck className="h-4 w-4 text-[#0F172A]" />
+                <span className="font-[family-name:var(--font-mono)] text-[12px] font-[600] text-[#aa2d00]">01</span>
+                <ShieldCheck className="h-4 w-4 text-[#181d26]" />
               </div>
-              <h3 className="font-[family-name:var(--font-serif)] text-[18px] font-bold text-[#0F172A]">
+              {/* label-md 16px/bold */}
+              <h3 className="text-[16px] font-bold text-[#181d26]">
                 Automated Position Extraction
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#475569]">
+              {/* body-md 14px/400 */}
+              <p className="text-[14px] leading-[1.6] text-[#41454d]">
                 Extracts non-contiguous disclosure text into structured Delta, Vega, and Curvature sensitivity tables.
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-lg border border-[#E2E8F0] bg-white p-5 shadow-2xs transition-shadow hover:shadow-xs">
+            {/* Card 2 — signature mint surface */}
+            <div className="flex flex-col gap-3 rounded-[10px] border border-[#a8d8c4] bg-[#a8d8c4] p-5">
               <div className="flex items-center gap-2">
-                <span className="font-[family-name:var(--font-mono)] text-[12px] font-bold text-[#B45309]">02</span>
-                <PieChart className="h-4 w-4 text-[#0F172A]" />
+                <span className="font-[family-name:var(--font-mono)] text-[12px] font-[600] text-[#0a2e0e]">02</span>
+                <PieChart className="h-4 w-4 text-[#0a2e0e]" />
               </div>
-              <h3 className="font-[family-name:var(--font-serif)] text-[18px] font-bold text-[#0F172A]">
+              <h3 className="text-[16px] font-bold text-[#0a2e0e]">
                 Standardised Capital Math
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#475569]">
+              <p className="text-[14px] leading-[1.6] text-[#0a2e0e]/80">
                 Computes aggregated capital charges across GIRR, Equity, FX, CSR Non-Sec, and Commodity risk classes.
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-lg border border-[#E2E8F0] bg-white p-5 shadow-2xs transition-shadow hover:shadow-xs">
+            {/* Card 3 — signature cream */}
+            <div className="flex flex-col gap-3 rounded-[10px] border border-[#dddddd] bg-[#f5e9d4] p-5">
               <div className="flex items-center gap-2">
-                <span className="font-[family-name:var(--font-mono)] text-[12px] font-bold text-[#B45309]">03</span>
-                <Sparkles className="h-4 w-4 text-[#0F172A]" />
+                <span className="font-[family-name:var(--font-mono)] text-[12px] font-[600] text-[#aa2d00]">03</span>
+                <Sparkles className="h-4 w-4 text-[#181d26]" />
               </div>
-              <h3 className="font-[family-name:var(--font-serif)] text-[18px] font-bold text-[#0F172A]">
+              <h3 className="text-[16px] font-bold text-[#181d26]">
                 IFSA Regulatory Audit Flagging
               </h3>
-              <p className="text-[13px] leading-relaxed text-[#475569]">
+              <p className="text-[14px] leading-[1.6] text-[#41454d]">
                 Flags reporting discrepancies, missing risk buckets, and regulatory breaches with exact citation quotes under IFSA audit rules.
               </p>
             </div>
+
           </div>
         </div>
+
+        {/* ── CTA Band Light — surface-strong near footer ───────────────────── */}
+        <div className="w-full max-w-[920px] rounded-[12px] bg-[#e0e2e6] px-12 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="font-milligram text-[32px] font-bold leading-[1.2] text-[#181d26]">
+            Start your FRTB-SA audit now.
+          </p>
+          {/* button-primary: near-black, white text, rounded-lg */}
+          <button
+            onClick={openFilePicker}
+            disabled={loading}
+            className="flex-shrink-0 rounded-[12px] bg-[#181d26] px-6 py-3.5 text-[16px] font-[500] text-white transition-colors active:bg-[#0d1218] disabled:opacity-40"
+          >
+            Upload Bank PDF
+          </button>
+        </div>
+
       </main>
     </div>
   );
 }
-

@@ -10,6 +10,8 @@ services:
       - ./data/chroma_db:/app/data/chroma_db
       - ./data/uploads:/app/data/uploads
       - ./data/hf_cache:/root/.cache/huggingface
+      - ./src:/app/src
+      - ./backend:/app/backend
     env_file:
       - .env
     environment:

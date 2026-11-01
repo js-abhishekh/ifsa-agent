@@ -1,13 +1,32 @@
 import { PortfolioPosition, UploadResponse, RunResponse } from "./types";
 
-const BASE = "/api";
+const getBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname || "localhost";
+    return `${window.location.protocol}//${host}:8000/api`;
+  }
+  return "http://127.0.0.1:8000/api";
+};
+
+const BASE = getBaseUrl();
 
 export async function uploadPdf(file: File): Promise<UploadResponse> {
   const form = new FormData();
   form.append("file", file);
   const res = await fetch(`${BASE}/upload-pdf`, { method: "POST", body: form });
   if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
-  return res.json();
+  const data: UploadResponse = await res.json();
+
+  // Surface extraction failures on the upload page rather than silently
+  // navigating to a run with zero positions.
+  if (data.extraction_status === "failed" || data.extraction_status === "partial") {
+    throw new Error(data.extraction_message);
+  }
+
+  return data;
 }
 
 export async function loadSamplePortfolio(): Promise<UploadResponse> {

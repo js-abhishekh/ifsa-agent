@@ -2,17 +2,8 @@
 
 import React from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell,
 } from "recharts";
 
 export interface ChartsPanelProps {
@@ -20,54 +11,68 @@ export interface ChartsPanelProps {
   donutData: Array<{ name: string; value: number; color: string }>;
 }
 
+// Airtable chart colors — signature + semantic palette
+const CHART_COLORS = {
+  delta:     "#254fad",  // info blue
+  vega:      "#006400",  // success green
+  curvature: "#aa2d00",  // signature coral
+};
+
 export default function ChartsPanel({ barData, donutData }: ChartsPanelProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-5">
-      {/* Stacked Bar Chart */}
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
-        <h3 className="mb-3 font-[family-name:var(--font-mono)] text-[11px] font-bold tracking-wider text-[#B45309] uppercase">
-          CHARGE BY RISK CLASS & SENSITIVITY METRIC
+      {/* Stacked bar — feature-card-tabbed: white canvas, rounded-lg (12px), hairline border, flat */}
+      <div className="rounded-[12px] border border-[#dddddd] bg-white p-5">
+        <h3 className="mb-3 font-[family-name:var(--font-mono)] text-[11px] font-[600] tracking-wider text-[#181d26] uppercase">
+          Charge by Risk Class &amp; Sensitivity Metric
         </h3>
         <div className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="#F1F5F9" vertical={false} />
+              {/* Airtable grid: hairline #dddddd */}
+              <CartesianGrid stroke="#dddddd" vertical={false} />
               <XAxis
                 dataKey="name"
-                tick={{ fill: "#475569", fontSize: 12, fontFamily: "var(--font-mono)", fontWeight: 600 }}
-                axisLine={{ stroke: "#CBD5E1" }}
+                tick={{ fill: "#333840", fontSize: 12, fontFamily: "var(--font-mono)", fontWeight: 500 }}
+                axisLine={{ stroke: "#dddddd" }}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: "#64748B", fontSize: 11, fontFamily: "var(--font-mono)" }}
+                tick={{ fill: "#9297a0", fontSize: 11, fontFamily: "var(--font-mono)" }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}k`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#FFFFFF",
-                  borderColor: "#E2E8F0",
-                  borderRadius: "8px",
-                  color: "#0F172A",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "#ffffff",
+                  borderColor: "#dddddd",
+                  borderRadius: "10px",
+                  color: "#181d26",
                   fontFamily: "var(--font-mono)",
                   fontSize: "12px",
                 }}
               />
-              <Legend wrapperStyle={{ fontFamily: "var(--font-mono)", fontSize: "11.5px", color: "#475569", paddingTop: "10px" }} />
-              <Bar dataKey="delta" stackId="a" fill="#1E3A8A" name="Delta Charge" />
-              <Bar dataKey="vega" stackId="a" fill="#059669" name="Vega Charge" />
-              <Bar dataKey="curvature" stackId="a" fill="#D97706" name="Curvature Charge" />
+              <Legend
+                wrapperStyle={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11.5px",
+                  color: "#41454d",
+                  paddingTop: "10px",
+                }}
+              />
+              <Bar dataKey="delta"     stackId="a" fill={CHART_COLORS.delta}     name="Delta Charge"     radius={[0,0,0,0]} />
+              <Bar dataKey="vega"      stackId="a" fill={CHART_COLORS.vega}      name="Vega Charge"      radius={[0,0,0,0]} />
+              <Bar dataKey="curvature" stackId="a" fill={CHART_COLORS.curvature} name="Curvature Charge" radius={[4,4,0,0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Donut Chart */}
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs">
-        <h3 className="mb-3 font-[family-name:var(--font-mono)] text-[11px] font-bold tracking-wider text-[#B45309] uppercase">
-          RISK CLASS CAPITAL ALLOCATION
+      {/* Donut chart */}
+      <div className="rounded-[12px] border border-[#dddddd] bg-white p-5">
+        <h3 className="mb-3 font-[family-name:var(--font-mono)] text-[11px] font-[600] tracking-wider text-[#181d26] uppercase">
+          Risk Class Capital Allocation
         </h3>
         <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -81,7 +86,7 @@ export default function ChartsPanel({ barData, donutData }: ChartsPanelProps) {
                 innerRadius={65}
                 outerRadius={95}
                 paddingAngle={3}
-                stroke="#FFFFFF"
+                stroke="#ffffff"
                 strokeWidth={2}
               >
                 {donutData.map((entry, index) => (
@@ -90,16 +95,21 @@ export default function ChartsPanel({ barData, donutData }: ChartsPanelProps) {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#FFFFFF",
-                  borderColor: "#E2E8F0",
-                  borderRadius: "8px",
-                  color: "#0F172A",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "#ffffff",
+                  borderColor: "#dddddd",
+                  borderRadius: "10px",
+                  color: "#181d26",
                   fontFamily: "var(--font-mono)",
                   fontSize: "12px",
                 }}
               />
-              <Legend wrapperStyle={{ fontFamily: "var(--font-mono)", fontSize: "11.5px", color: "#475569" }} />
+              <Legend
+                wrapperStyle={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11.5px",
+                  color: "#41454d",
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -107,4 +117,3 @@ export default function ChartsPanel({ barData, donutData }: ChartsPanelProps) {
     </div>
   );
 }
-

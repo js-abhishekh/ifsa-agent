@@ -13,9 +13,9 @@ The math is entirely deterministic; no LLM calls occur here.
 """
 import math
 from src.graph.state import PortfolioPosition, ExtractedLogic, CalculatedMetric
+from src.quant.risk_weights import DEFAULT_INTRA_CORRELATIONS
 
 
-# ── Step 1: Weighted sensitivities ────────────────────────────────────────────
 def compute_weighted_sensitivities(
     positions: list[PortfolioPosition],
     risk_weights: dict[str, float],
@@ -48,16 +48,21 @@ def bucket_kb(
     positions: list[PortfolioPosition],
     weighted_sens: dict[str, float],
     correlations: dict[str, float],
+    risk_class: str | None = None,
 ) -> float:
     """Compute K_b for a single bucket.
 
     K_b = sqrt(max(0, Σ WS_k² + Σ_{k≠l} ρ_kl WS_k WS_l))
 
     Correlation lookup order for pair (k, l):
-      "{rf_k}_{rf_l}" → "{rf_l}_{rf_k}" → "rho_intra_default" → "rho_default" → 1.0
+      1. Identical risk factor: 1.0 (or "rho_intra_same_issuer")
+      2. Specific pair: "{rf_k}_{rf_l}" or "{rf_l}_{rf_k}"
+      3. Intra-bucket defaults: "rho_intra_default" or "rho_default"
+      4. Statutory Basel baseline per risk class (e.g., Equity 0.25, CSR 0.35, Commodity 0.40, GIRR 0.80)
     """
     ids = [p.instrument_id for p in positions]
     rfs = {p.instrument_id: p.risk_factor for p in positions}
+    rc = risk_class or (positions[0].risk_class if positions else None)
 
     sum_sq = sum(weighted_sens[i] ** 2 for i in ids)
 
@@ -67,12 +72,19 @@ def bucket_kb(
             k, l = ids[k_idx], ids[l_idx]
             rf_k, rf_l = rfs[k], rfs[l]
 
-            rho = (
-                correlations.get(f"{rf_k}_{rf_l}")
-                or correlations.get(f"{rf_l}_{rf_k}")
-                or correlations.get("rho_intra_default")
-                or correlations.get("rho_default", 1.0)
-            )
+            if rf_k == rf_l:
+                rho = correlations.get("rho_intra_same_issuer", 1.0)
+            else:
+                # Use explicit is-None checks: a legitimate zero correlation (e.g.
+                # CSR_Sec gamma_bc=0.0) must not be treated as "missing" by Python's or.
+                rho = None
+                for _key in (f"{rf_k}_{rf_l}", f"{rf_l}_{rf_k}", "rho_intra_default", "rho_default"):
+                    _val = correlations.get(_key)
+                    if _val is not None:
+                        rho = _val
+                        break
+                if rho is None:
+                    rho = DEFAULT_INTRA_CORRELATIONS.get(rc, 0.50)
             cross_term += 2 * rho * weighted_sens[k] * weighted_sens[l]
 
     return math.sqrt(max(sum_sq + cross_term, 0.0))
@@ -113,7 +125,7 @@ def sbm_delta_charge(
 
     for bucket, bpos in by_bucket.items():
         ws = compute_weighted_sensitivities(bpos, logic.risk_weights)
-        kb = bucket_kb(bpos, ws, logic.correlations)
+        kb = bucket_kb(bpos, ws, logic.correlations, risk_class=logic.risk_class)
         sb = _bucket_sb(bpos, ws, kb)
         bucket_kb_values[bucket] = kb
         bucket_sb_values[bucket] = sb

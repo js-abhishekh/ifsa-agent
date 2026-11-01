@@ -45,15 +45,16 @@ async def retriever_node(state: AgentState) -> AgentState:
         retrieved_regulatory_nodes: list[RegulatoryNode]
     """
     import asyncio
-    store = await asyncio.to_thread(_get_store)
     positions = state.get("portfolio_inputs", [])
     risk_classes = {p.risk_class for p in positions}
 
-    # Fallback: If no granular positions were extracted from the PDF, 
-    # query default FRTB risk classes so regulatory rules are still retrieved.
+    # If no portfolio positions exist, skip ChromaDB query entirely
     if not risk_classes:
-        risk_classes = {"GIRR", "Equity", "FX", "CSR_NonSec"}
+        print("[retriever] No positions in portfolio; skipping regulatory rule retrieval.", flush=True)
+        state["retrieved_regulatory_nodes"] = []
+        return state
 
+    store = await asyncio.to_thread(_get_store)
     nodes: list[RegulatoryNode] = []
 
     store_count = await asyncio.to_thread(store.count)
