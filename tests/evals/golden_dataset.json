@@ -1,0 +1,312 @@
+[
+  {
+    "id": "GIRR-001",
+    "risk_class": "GIRR",
+    "description": "Standard 5Y USD treasury sensitivity",
+    "clause_text": "For GIRR delta risk, the risk weight for the 5-year tenor bucket is 1.1% (0.011). The within-bucket tenor correlation for the 5Y and 10Y tenors is 0.905, calculated as exp(-0.03 × |5 - 10|). Cross-currency gamma is 0.42.",
+    "expected_risk_weights": {
+      "5Y": 0.011,
+      "10Y": 0.011
+    },
+    "expected_correlations": {
+      "5Y_10Y": 0.905,
+      "gamma_bc": 0.42
+    },
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "GIRR-002",
+    "risk_class": "GIRR",
+    "description": "Short-end tenor risk weights",
+    "clause_text": "GIRR risk weights: the 0.25Y and 0.5Y tenor buckets carry a risk weight of 1.7% under MAR21.44. The 1Y tenor carries 1.6% and the 2Y tenor carries 1.3%.",
+    "expected_risk_weights": {
+      "0.25Y": 0.017,
+      "0.5Y": 0.017,
+      "1Y": 0.016,
+      "2Y": 0.013
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "GIRR-003",
+    "risk_class": "GIRR",
+    "description": "Long-end tenor weights including 30Y",
+    "clause_text": "Under MAR21.44, the 15Y, 20Y and 30Y tenor buckets each have a risk weight of 1.1% for GIRR delta. Inflation risk weight is 1.6%.",
+    "expected_risk_weights": {
+      "15Y": 0.011,
+      "20Y": 0.011,
+      "30Y": 0.011,
+      "inflation": 0.016
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "FX-001",
+    "risk_class": "FX",
+    "description": "Standard FX delta risk weight",
+    "clause_text": "FX delta risk: a flat risk weight of 15% (0.15) applies to all currency pairs under MAR21.88. Cross-bucket gamma for FX is 0.60.",
+    "expected_risk_weights": {
+      "default": 0.15
+    },
+    "expected_correlations": {
+      "gamma_bc": 0.60
+    },
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "FX-002",
+    "risk_class": "FX",
+    "description": "Pegged currency pair reduced risk weight",
+    "clause_text": "For pegged or managed currency pairs, Basel III MAR21.88 allows a reduced FX risk weight of 10% (0.10) rather than the standard 15%.",
+    "expected_risk_weights": {
+      "pegged": 0.10
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "EQ-001",
+    "risk_class": "Equity",
+    "description": "EM large-cap equity risk weights",
+    "clause_text": "Equity risk weights under MAR21.71: Bucket 1 (EM large-cap consumer goods/services) 55%, Bucket 2 (EM large-cap telecoms/industrials) 60%, Bucket 3 (EM large-cap basic materials/energy) 45%.",
+    "expected_risk_weights": {
+      "1": 0.55,
+      "2": 0.60,
+      "3": 0.45
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "EQ-002",
+    "risk_class": "Equity",
+    "description": "DM large-cap equity buckets 5-8",
+    "clause_text": "DM large-cap equity risk weights per MAR21.71: consumer goods/services (Bucket 5) 30%, telecoms/industrials (Bucket 6) 35%, basic materials/energy (Bucket 7) 40%, financials (Bucket 8) 50%.",
+    "expected_risk_weights": {
+      "5": 0.30,
+      "6": 0.35,
+      "7": 0.40,
+      "8": 0.50
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "EQ-003",
+    "risk_class": "Equity",
+    "description": "Cross-bucket equity gamma correlations",
+    "clause_text": "Cross-bucket equity correlations under MAR21.76: gamma between same EM buckets is 15%, same DM buckets 15%, EM-DM cross is 7.5%. Within-bucket intra correlation for same issuer is 99.9%, different names 25%.",
+    "expected_risk_weights": {},
+    "expected_correlations": {
+      "gamma_bc_same_em": 0.15,
+      "gamma_bc_same_dm": 0.15,
+      "gamma_bc_em_dm": 0.075,
+      "rho_intra_default": 0.25
+    },
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": false
+  },
+  {
+    "id": "CSR-001",
+    "risk_class": "CSR_NonSec",
+    "description": "Investment-grade CSR sovereign bucket",
+    "clause_text": "CSR non-securitisation under MAR21.54: Bucket 1 (IG sovereign) risk weight is 0.5% (0.005). Bucket 3 (IG financial) is 5% (0.050).",
+    "expected_risk_weights": {
+      "1": 0.005,
+      "3": 0.050
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "CSR-002",
+    "risk_class": "CSR_NonSec",
+    "description": "High-yield CSR buckets",
+    "clause_text": "For high-yield or non-rated issuers, MAR21.54 specifies: HY/NR sovereign (Bucket 10) 3%, HY/NR financial (Bucket 12) 7%, HY/NR other (Bucket 17) 12%, Residual (Bucket 18) 15%.",
+    "expected_risk_weights": {
+      "10": 0.030,
+      "12": 0.070,
+      "17": 0.120,
+      "18": 0.150
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "CSR-003",
+    "risk_class": "CSR_NonSec",
+    "description": "CSR intra-bucket correlations",
+    "clause_text": "CSR non-securitisation correlations per MAR21.58: rho for same issuer different tenor is 35%, same tenor same issuer is 65%, basis risk for same bond is 99.9%. Cross-bucket gamma is 35%.",
+    "expected_risk_weights": {},
+    "expected_correlations": {
+      "rho_name": 0.35,
+      "rho_tenor": 0.65,
+      "rho_basis": 0.999,
+      "gamma_bc": 0.35
+    },
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": false
+  },
+  {
+    "id": "COMM-001",
+    "risk_class": "Commodity",
+    "description": "Commodity energy and freight buckets",
+    "clause_text": "Commodity risk weights per MAR21.81: Bucket 1 (solid combustibles) 30%, Bucket 2 (liquid combustibles) 35%, Bucket 3 (electricity/carbon) 60%, Bucket 4 (freight) 80%.",
+    "expected_risk_weights": {
+      "1": 0.30,
+      "2": 0.35,
+      "3": 0.60,
+      "4": 0.80
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "COMM-002",
+    "risk_class": "Commodity",
+    "description": "Commodity metals and agricultural buckets",
+    "clause_text": "Per MAR21.81: Bucket 5 (non-precious metals) 40%, Bucket 7 (precious metals including gold) 18%, Bucket 8 (grains/oilseed) 35%, Bucket 9 (livestock/dairy) 20%.",
+    "expected_risk_weights": {
+      "5": 0.40,
+      "7": 0.18,
+      "8": 0.35,
+      "9": 0.20
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "COMM-003",
+    "risk_class": "Commodity",
+    "description": "Commodity intra-bucket correlations",
+    "clause_text": "Commodity intra-bucket correlations per MAR21.84: rho for same grade is 70%, different grade 40%. Cross-bucket gamma is 20%.",
+    "expected_risk_weights": {},
+    "expected_correlations": {
+      "rho_same_grade": 0.70,
+      "rho_diff_grade": 0.40,
+      "gamma_bc": 0.20
+    },
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": false
+  },
+  {
+    "id": "CSR_SEC-001",
+    "risk_class": "CSR_Sec",
+    "description": "Securitisation risk weights",
+    "clause_text": "CSR securitisation risk weights per MAR21.63: Senior IG (Bucket 1) 1.6% (0.016), Senior mezzanine (Bucket 2) 2.5% (0.025), Non-senior IG (Bucket 3) 5.0% (0.050), Non-senior HY (Bucket 4) 10.0% (0.100).",
+    "expected_risk_weights": {
+      "1": 0.016,
+      "2": 0.025,
+      "3": 0.050,
+      "4": 0.100
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "INCOMPLETE-001",
+    "risk_class": "GIRR",
+    "description": "Incomplete text — no explicit numeric risk weights",
+    "clause_text": "GIRR sensitivities must be computed across all material risk factors including interest rates, inflation, and cross-currency basis. Banks must ensure adequate coverage of the yield curve.",
+    "expected_risk_weights": {},
+    "expected_correlations": {},
+    "expected_formula_ref_contains": null,
+    "expected_mar_clause": null,
+    "expected_is_complete": false
+  },
+  {
+    "id": "FALLBACK-001",
+    "risk_class": "FX",
+    "description": "Ambiguous text that should trigger static fallback",
+    "clause_text": "The bank applies FX risk treatments consistent with applicable regulatory standards.",
+    "expected_risk_weights": {},
+    "expected_correlations": {},
+    "expected_formula_ref_contains": null,
+    "expected_mar_clause": null,
+    "expected_is_complete": false
+  },
+  {
+    "id": "GIRR-004",
+    "risk_class": "GIRR",
+    "description": "Full GIRR parameter set — reference benchmark",
+    "clause_text": "GIRR delta: tenor risk weights per MAR21.44 are 0.25Y=1.7%, 0.5Y=1.7%, 1Y=1.6%, 2Y=1.3%, 3Y=1.2%, 5Y=1.1%, 10Y=1.1%, 15Y=1.1%, 20Y=1.1%, 30Y=1.1%. Cross-bucket gamma=0.42. Within-bucket tenor correlations use exp(-0.03×|Tk-Tl|): 5Y-10Y=0.905.",
+    "expected_risk_weights": {
+      "0.25Y": 0.017,
+      "0.5Y": 0.017,
+      "1Y": 0.016,
+      "2Y": 0.013,
+      "3Y": 0.012,
+      "5Y": 0.011,
+      "10Y": 0.011,
+      "15Y": 0.011,
+      "20Y": 0.011,
+      "30Y": 0.011
+    },
+    "expected_correlations": {
+      "gamma_bc": 0.42,
+      "5Y_10Y": 0.905
+    },
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "EQ-004",
+    "risk_class": "Equity",
+    "description": "Small-cap equity buckets",
+    "clause_text": "Small-cap equity buckets per MAR21.71: Bucket 9 (EM small-cap all sectors) 70%, Bucket 10 (DM small-cap all sectors) 50%, Bucket 11 (indices, ETFs, other) 70%.",
+    "expected_risk_weights": {
+      "9": 0.70,
+      "10": 0.50,
+      "11": 0.70
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  },
+  {
+    "id": "CSR-004",
+    "risk_class": "CSR_NonSec",
+    "description": "IG covered bonds and tech/telecom buckets",
+    "clause_text": "CSR non-securitisation: Bucket 6 (IG tech/telecoms) 2% (0.020), Bucket 7 (IG healthcare/utilities) 2.5% (0.025), Bucket 8 (IG covered bonds) 1.5% (0.015) per MAR21.54.",
+    "expected_risk_weights": {
+      "6": 0.020,
+      "7": 0.025,
+      "8": 0.015
+    },
+    "expected_correlations": {},
+    "expected_formula_ref_contains": "MAR21",
+    "expected_mar_clause": "MAR21",
+    "expected_is_complete": true
+  }
+]
